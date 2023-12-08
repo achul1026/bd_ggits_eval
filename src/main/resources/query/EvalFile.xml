@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN' 'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace='com.neighbor21.ggits.evaluation.common.mapper.EvalFileMapper'>
+
+	<insert id="save" parameterType="evalFile">
+		INSERT INTO EVAL_FILE(	
+								FILE_ID, 
+								SHT_INFO_ID, 
+								FILE_TYPE, 
+								FILE_NM, 
+								FILE_OGN_NM, 
+								FILE_EXTNSN, 
+								FILE_PATH, 
+								FILE_SIZE
+							)VALUES(
+								#{fileId}, 
+								#{shtInfoId}, 
+								#{fileType},
+								#{fileNm},
+								#{fileOgnNm},
+								#{fileExtnsn},
+								#{filePath},
+								#{fileSize}
+							);
+	</insert>
+	
+	<select id="findAllByShtInfoId" parameterType="String" resultType="evalFile">
+		SELECT 	FILE_ID, 
+				SHT_INFO_ID, 
+				FILE_TYPE, 
+				FILE_NM, 
+				FILE_OGN_NM, 
+				FILE_EXTNSN, 
+				FILE_PATH, 
+				FILE_SIZE
+		FROM 	EVAL_FILE
+		WHERE 	SHT_INFO_ID = #{shtInfoId}
+	</select>
+	
+	<select id="findAllByShtInfoIdAndRequestFileAndAttachmentFile" parameterType="String" resultType="evalFile">
+		SELECT 	FILE_ID, 
+				SHT_INFO_ID, 
+				FILE_TYPE, 
+				FILE_NM, 
+				FILE_OGN_NM, 
+				FILE_EXTNSN, 
+				FILE_PATH, 
+				FILE_SIZE
+		FROM 	EVAL_FILE
+		WHERE 	SHT_INFO_ID = #{shtInfoId}
+		AND 	FILE_TYPE IN ('FTC001','FTC002')
+	</select>
+	
+	<select id="findAllByShtInfoIdAndFileType" parameterType="evalFile" resultType="evalFile">
+		SELECT 	FILE_ID, 
+				SHT_INFO_ID, 
+				FILE_TYPE, 
+				FILE_NM, 
+				FILE_OGN_NM, 
+				FILE_EXTNSN, 
+				FILE_PATH, 
+				FILE_SIZE
+		FROM 	EVAL_FILE
+		WHERE 	SHT_INFO_ID = #{shtInfoId}
+		AND		FILE_TYPE	= #{fileType}
+	</select>
+	
+	<delete id="deleteByShtInfoId" parameterType="String">
+		DELETE FROM EVAL_FILE WHERE SHT_INFO_ID = #{shtInfoId}
+	</delete>
+	
+	<delete id="deleteByFileId" parameterType="String">
+		DELETE FROM EVAL_FILE WHERE FILE_ID = #{fileId}
+	</delete>
+	
+	<select id="findOneByFileId" parameterType="String" resultType="evalFile">
+		SELECT 	FILE_ID, 
+				SHT_INFO_ID, 
+				FILE_TYPE, 
+				FILE_NM, 
+				FILE_OGN_NM, 
+				FILE_EXTNSN, 
+				FILE_PATH, 
+				FILE_SIZE
+		FROM 	EVAL_FILE
+		WHERE 	FILE_ID = #{fileId}
+	</select>
+</mapper>

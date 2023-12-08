@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN' 'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace='com.neighbor21.ggits.evaluation.common.mapper.EvalRtrListMapper'>
+
+
+	<insert id="save" parameterType="evalRtrList">
+		INSERT INTO EVAL_RTR_LIST	(
+									RTR_LST_ID, 
+									RTR_ID, 
+									SHT_INFO_ID, 
+									EVAL_CMPLT
+									)VALUES(
+									#{rtrLstId}, 
+									#{rtrId}, 
+									#{shtInfoId}, 
+									#{evalCmplt}
+									)
+				
+	</insert>
+	 
+	<select id="countAllByShtInfoId" parameterType="String" resultType="int">
+		SELECT 
+				COUNT(*)
+		FROM	EVAL_RTR_LIST
+		WHERE 	SHT_INFO_ID = #{shtInfoId} 
+	</select>
+	
+	<update id="updateEvalCmpltByRtrIdAndShtInfoId" parameterType="evalRtrList">
+		UPDATE EVAL_RTR_LIST erl
+		SET erl.EVAL_CMPLT = "Y"
+		WHERE erl.RTR_ID = #{rtrId}
+		AND erl.SHT_INFO_ID = #{shtInfoId}
+	</update>
+	
+	<select id="countAllByShtInfoIdAndEvalCmplt" parameterType="evalRtrList" resultType="int">
+		SELECT count(*)
+		FROM EVAL_RTR_LIST erl 
+		WHERE erl.SHT_INFO_ID = #{shtInfoId}
+		AND erl.EVAL_CMPLT = "N"
+	</select>
+	
+	<select id="findAllByShtInfoId" parameterType="String" resultType="map">
+		SELECT 
+				erl.RTR_LST_ID 	AS "rtrListId",
+				erl.RTR_ID 		AS "rtrId"
+		FROM 	EVAL_RTR_LIST erl 
+		WHERE 	erl.SHT_INFO_ID = #{shtInfoId}
+	</select>
+	
+	<delete id="deleteByRtrListId" parameterType="String">
+		DELETE
+		FROM 	EVAL_RTR_LIST erl
+		WHERE 	erl.RTR_LST_ID = #{rtrListId}
+	</delete>
+</mapper>

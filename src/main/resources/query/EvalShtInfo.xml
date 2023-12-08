@@ -1,0 +1,189 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN' 'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace='com.neighbor21.ggits.evaluation.common.mapper.EvalShtInfoMapper'>
+
+	<insert id="save" parameterType="evalShtInfo">
+		INSERT INTO EVAL_SHT_INFO
+			(
+				SHT_INFO_ID,
+				ACCSS_CD, 
+				SHT_NM, 
+				INFO_URL, 
+<!-- 				<if test='endDt !=  ""'> -->
+<!-- 				END_DT,  -->
+<!-- 				</if> -->
+<!-- 				MNGR_NM,  -->
+				CRT_DT, 
+				SHT_ALL_STTS
+			)VALUES(
+				#{shtInfoId},
+				#{accssCd},
+				#{shtNm},
+				#{infoUrl},
+<!-- 				<if test='endDt != ""'> -->
+<!-- 				STR_TO_DATE(#{endDt}, '%Y-%m-%d'), -->
+<!-- 				</if> -->
+<!-- 				#{mngrNm}, -->
+				NOW(),
+				#{shtAllStts}
+			)
+	</insert>
+	
+	<select id="findOneByShtInfoId" parameterType="evalShtInfo" resultType="evalShtInfo">
+		SELECT 	
+				SHT_INFO_ID, 
+				SHT_NM, 
+				INFO_URL,
+				ACCSS_CD, 
+<!-- 				END_DT,  -->
+<!-- 				MNGR_NM,  -->
+				CRT_DT, 
+				SHT_ALL_STTS
+		FROM 	EVAL_SHT_INFO
+		WHERE 	SHT_INFO_ID	= #{shtInfoId}
+	</select>
+	
+	<update id="update" parameterType="evalShtInfo">
+		UPDATE 
+				EVAL_SHT_INFO 
+		SET		SHT_NM 			= #{shtNm}, 
+				INFO_URL 		= #{infoUrl}, 
+<!-- 				<if test='endDt != ""'> -->
+<!-- 				END_DT			= #{endDt},  -->
+<!-- 				</if> -->
+<!-- 				MNGR_NM			= #{mngrNm}, -->
+				ACCSS_CD		= #{accssCd}, 
+				SHT_ALL_STTS	= #{shtAllStts}
+		WHERE	SHT_INFO_ID		= #{shtInfoId}	
+	</update>
+	
+	<select id="findAll" parameterType="evalShtInfo" resultType="evalShtInfo">
+		SELECT 	
+				SHT_INFO_ID,
+				ACCSS_CD, 
+				SHT_NM, 
+				INFO_URL, 
+<!-- 				END_DT,  -->
+<!-- 				MNGR_NM,  -->
+				DATE_FORMAT(CRT_DT,'%Y-%m-%d') AS "strCrtDt", 
+				SHT_ALL_STTS
+		FROM 	EVAL_SHT_INFO
+		WHERE 	1=1
+		<if test="schSchStts != null and schSchStts != '' and schSchStts != 'all' ">
+		AND SHT_ALL_STTS IN(
+			<if test="schSchStts == 'writing' ">
+				'ESC001','ESC002','ESC003','ESC004'	
+			</if>
+			<if test="schSchStts == 'waiting' ">
+				'ESC005'	
+			</if>
+			<if test="schSchStts == 'progress' ">
+				'ESC006'	
+			</if>
+			<if test="schSchStts == 'complete' ">
+				'ESC000'	
+			</if>
+			)
+		</if>
+		<if test="schShtNm != null and schShtNm !='' ">
+		AND SHT_NM LIKE CONCAT('%',#{schShtNm},'%')
+		</if>
+		ORDER BY CRT_DT DESC
+		<if test="pageNo != null ">
+		LIMIT 3 OFFSET #{pageNo}  	    	
+		</if>
+	</select>
+	
+	<select id="countAll" parameterType="evalShtInfo" resultType="int">
+		SELECT 	
+				COUNT(*)
+		FROM 	EVAL_SHT_INFO
+		WHERE 	1=1
+		<if test="schSchStts != null and schSchStts != '' and schSchStts != 'all' ">
+		AND SHT_ALL_STTS IN(
+			<if test="schSchStts == 'writing' ">
+				'ESC001','ESC002','ESC003','ESC004'	
+			</if>
+			<if test="schSchStts == 'waiting' ">
+				'ESC005'	
+			</if>
+			<if test="schSchStts == 'progress' ">
+				'ESC006'	
+			</if>
+			<if test="schSchStts == 'complete' ">
+				'ESC000'	
+			</if>
+			)
+		</if>
+		<if test="schShtNm != null and schShtNm !='' ">
+		AND SHT_NM LIKE CONCAT('%',#{schShtNm},'%')
+		</if>
+	</select>
+	
+	<delete id="deleteByShtInfoId" parameterType="String">
+		DELETE FROM EVAL_SHT_INFO WHERE SHT_INFO_ID = #{shtInfoId}
+	</delete>
+	
+	
+	<select id="findOneShtInfoByAccssCd" parameterType="String" resultType="evalShtInfo">
+		SELECT  
+				esi.SHT_INFO_ID,
+				esi.SHT_ALL_STTS,
+				esi.SHT_NM 
+		FROM    EVAL_SHT_INFO esi 
+		WHERE   BINARY esi.ACCSS_CD = #{accssCd}
+	</select>
+	
+	<select id="findOneShtInfoByShtInfoId" parameterType="String" resultType="evalShtInfo">
+		SELECT
+				esi.SHT_NM,
+<!-- 				esi.MNGR_NM, -->
+				esi.INFO_URL
+<!-- 				DATE_FORMAT(esi.END_DT, '%Y년 %m월 %d일') as END_DT -->
+		FROM 	EVAL_SHT_INFO esi 
+		WHERE 	esi.SHT_INFO_ID = #{shtInfoId}
+	</select>
+	
+	<select id="countAllForShtAllStts" resultType="map">
+		SELECT
+			IFNULL(SUM(ESI.COMPLETE_CNT+ESI.WRITING_CNT+ESI.WAITING_CNT+ESI.PROGRESS_CNT),0) AS "totalCnt",
+			IFNULL(SUM(ESI.COMPLETE_CNT),0) AS "completeCnt",
+			IFNULL(SUM(ESI.WRITING_CNT),0) AS "writingCnt",
+			IFNULL(SUM(ESI.WAITING_CNT),0) AS "waitingCnt",
+			IFNULL(SUM(ESI.PROGRESS_CNT),0) AS "progressCnt"
+		FROM
+			(
+			SELECT
+				CASE WHEN SHT_ALL_STTS = 'ESC000' THEN COUNT(SHT_ALL_STTS) ELSE 0 END AS COMPLETE_CNT,
+				CASE WHEN 	SHT_ALL_STTS 	= 'ESC001' 
+							OR SHT_ALL_STTS = 'ESC002' 
+							OR SHT_ALL_STTS = 'ESC003' 
+							OR SHT_ALL_STTS = 'ESC004'
+					THEN COUNT(SHT_ALL_STTS) ELSE 0 END AS "WRITING_CNT",
+				CASE WHEN SHT_ALL_STTS = 'ESC005' THEN COUNT(SHT_ALL_STTS) ELSE 0 END AS WAITING_CNT,
+				CASE WHEN SHT_ALL_STTS = 'ESC006' THEN COUNT(SHT_ALL_STTS) ELSE 0 END AS PROGRESS_CNT
+			FROM
+				EVAL_SHT_INFO 
+			group by SHT_ALL_STTS
+		)ESI
+	</select>
+	
+	<select id="countByAccssCode" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM EVAL_SHT_INFO WHERE ACCSS_CD = #{accssCd}
+	</select>
+	
+	<select id="countAllByShtInfoIdAndShtAllStts" parameterType="evalShtInfo" resultType="int">
+		SELECT 	COUNT(*)
+		FROM 	EVAL_SHT_INFO esi 
+		WHERE 	
+				esi.SHT_INFO_ID = #{shtInfoId}
+		AND 	esi.SHT_ALL_STTS = #{shtAllStts}
+	</select>
+	
+	<update id="updateShtAllSttsByshtInfoId" parameterType="evalShtInfo">
+		UPDATE 	EVAL_SHT_INFO esi
+		SET 	esi.SHT_ALL_STTS = #{shtAllStts}
+		WHERE 	esi.SHT_INFO_ID = #{shtInfoId}
+	</update>
+</mapper>

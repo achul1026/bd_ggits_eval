@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN' 'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace='com.neighbor21.ggits.evaluation.common.mapper.EvalRtrItemScrMapper'>
+	<select id="findAllRtrItemScrJoinRtrShtByRtrShtId" parameterType="string" resultType="evalRtrItemScr">
+		SELECT 
+				eris.RTR_SHT_ID,
+				eris.SHT_ITM_ID,
+				eris.SCR
+		FROM 
+				EVAL_RTR_ITEM_SCR eris 
+		INNER 	JOIN EVAL_RTR_SHT ers ON(ers.RTR_SHT_ID = eris.RTR_SHT_ID)
+		WHERE 	ers.RTR_SHT_ID = #{rtrShtId}
+	</select>
+	
+	<insert id="save" parameterType="evalRtrItemScr">
+		INSERT INTO EVAL_RTR_ITEM_SCR
+			(
+				RTR_SCTR_SCR_ID,
+				RTR_SHT_ID,
+				SHT_ITM_ID,
+				SCR 
+			) VALUES (
+				#{rtrSctrScrId},
+				#{rtrShtId},
+				#{shtItmId},
+				#{scr}
+			)
+	</insert>
+	
+	<update id="update" parameterType="evalRtrItemScr">
+		UPDATE 
+				EVAL_RTR_ITEM_SCR eris
+		SET 
+				eris.SCR = #{scr}
+		WHERE 
+				eris.SHT_ITM_ID = #{shtItmId}
+		AND		eris.RTR_SHT_ID = #{rtrShtId}
+	</update>
+	
+</mapper>

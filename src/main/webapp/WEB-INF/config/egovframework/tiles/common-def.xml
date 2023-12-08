@@ -1,0 +1,39 @@
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+
+    <definition name="login_base" template="/WEB-INF/jsp/_tiles/_layout/loginLayout.jsp">
+        <put-attribute name="head" value="/WEB-INF/jsp/_tiles/_template/loginHead.jsp" />
+    </definition>
+    
+     <!-- 기본 -->
+    <definition name="site_base" template="/WEB-INF/jsp/_tiles/_layout/contentLayout.jsp">
+        <put-attribute name="head" value="/WEB-INF/jsp/_tiles/_template/head.jsp" />
+    </definition>
+    
+    <definition name="modal_base" template="/WEB-INF/jsp/_tiles/_layout/modalLayout.jsp">
+    </definition>
+    
+    <!--  예시 경로 site/* -->
+    <definition name="login/*" extends="login_base">
+        <put-attribute name="content" value="/WEB-INF/jsp/ggits/login/{1}.jsp" />
+    </definition>
+    
+    <!--  메인 경로 site/* -->
+    <definition name="main/*" extends="site_base">
+        <put-attribute name="content" value="/WEB-INF/jsp/ggits/main/{1}.jsp" />
+    </definition>
+
+    <!--  예시 경로 site/aaa/bbb -->
+    <definition name="view/*/*" extends="site_base">
+        <put-attribute name="content" value="/WEB-INF/jsp/ggits/{1}/{2}.jsp" />
+    </definition>
+	
+	<!--  모달 경로 -->
+    <definition name="modal/*/*" extends="modal_base">
+        <put-attribute name="content" value="/WEB-INF/jsp/ggits/{1}/{2}.jsp" />
+    </definition>
+    
+</tiles-definitions>

@@ -1,0 +1,222 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN' 'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace='com.neighbor21.ggits.evaluation.common.mapper.EvalShtMapper'>
+
+	<delete id="deleteByShtInfoId" parameterType="String">
+		DELETE FROM EVAL_SHT WHERE SHT_INFO_ID = #{shtInfoId}
+	</delete>
+	
+	<select id="findAllByShtInfoId" parameterType="String" resultType="evalSht">
+		SELECT 
+				SHT_ID,
+				SHT_INFO_ID,
+				SHT_TYPE
+		FROM	EVAL_SHT
+		WHERE 	SHT_INFO_ID = #{shtInfoId}
+	</select>
+	
+	<select id="findAllJoinEvalShtInfoByShtInfoId" parameterType="String" resultType="evalSht">
+		SELECT 
+				es.SHT_ID,
+				es.SHT_TYPE 
+		FROM 	
+				EVAL_SHT es 
+		INNER 	JOIN EVAL_SHT_INFO esi ON(es.SHT_INFO_ID = esi.SHT_INFO_ID)
+		WHERE esi.SHT_INFO_ID = #{shtInfoId}
+		ORDER BY es.SHT_TYPE
+	</select>
+	
+	<insert id="save" parameterType="evalSht">
+		INSERT INTO EVAL_SHT(
+							SHT_ID, 
+							SHT_INFO_ID, 
+							SHT_TYPE
+							)VALUES(
+							#{shtId}, 
+							#{shtInfoId}, 
+							#{shtType}
+							)
+
+	</insert>
+	
+	<select id="countByShtInfoIdAndShtType" parameterType="evalSht" resultType="int">
+		SELECT 
+				COUNT(*)
+		FROM	EVAL_SHT
+		WHERE 	SHT_INFO_ID = #{shtInfoId}
+		AND 	SHT_TYPE	= #{shtType}
+			
+	</select>
+	
+	<select id="findOneShtExistCheck" parameterType="String" resultType="String">
+		SELECT
+			 CASE 	WHEN COUNT(SHT_TYPE) = 0 THEN 'BOTH_EMPTY' 
+			 		WHEN COUNT(SHT_TYPE) = 1 THEN  
+											 CASE 	WHEN (SELECT COUNT(SHT_TYPE) FROM EVAL_SHT esqnt WHERE esqnt.SHT_INFO_ID = es.SHT_INFO_ID AND  SHT_TYPE= 'qnt') THEN 'QLT_EMPTY' 
+											 		WHEN (SELECT COUNT(SHT_TYPE) FROM EVAL_SHT esqnt WHERE esqnt.SHT_INFO_ID = es.SHT_INFO_ID AND SHT_TYPE= 'qlt') THEN 'QNT_EMPTY'
+											 		ELSE ''
+											 END
+			 		ELSE 'BOTH_EXIST' 
+			 		END AS 'shtExistCheck'
+		FROM
+			EVAL_SHT es
+		WHERE
+			SHT_INFO_ID = #{shtInfoId}
+				
+	</select>
+	
+	<select id="findOneByShtInfoIdAndShtType" parameterType="evalSht" resultType="evalSht"> 
+		SELECT 
+				SHT_ID,
+				SHT_INFO_ID,
+				SHT_TYPE
+		FROM	EVAL_SHT
+		WHERE 	SHT_INFO_ID = #{shtInfoId}
+		<if test="shtType != null and shtType != '' and shtType != 'all'">
+		AND		SHT_TYPE = #{shtType}
+		</if>
+	</select>
+	
+	<select id="findOneRsultHeaderInfoByShtInfoIdAndShtId" parameterType="map" resultType="com.neighbor21.ggits.evaluation.common.dto.EvalResultDTO$EvalResultHeaderInfo">
+		SELECT 
+				GROUP_CONCAT(HEADER_LIST_INFO.BDD_CMP_ID) AS BDD_CMP_ID_LIST,
+				GROUP_CONCAT(HEADER_LIST_INFO.BDD_CMP_NM) AS BDD_CMP_NM_LIST,
+				GROUP_CONCAT(HEADER_LIST_INFO.TOTAL_SUM_SCR) AS TOTAL_SUM_LIST,
+				GROUP_CONCAT(FLOOR(HEADER_LIST_INFO.TOTAL_AVG_SCR)) AS TOTAL_AVG_LIST,
+				GROUP_CONCAT(HEADER_LIST_INFO.MAX_SCR) AS MAX_SCR_LIST,
+				GROUP_CONCAT(HEADER_LIST_INFO.MIN_SCR) AS MIN_SCR_LIST
+		FROM (
+				SELECT
+						HEADER_INFO.BDD_CMP_ID ,
+				      	HEADER_INFO.BDD_CMP_NM ,
+		      			SUM(HEADER_INFO.SUM_SCR) - (MAX(HEADER_INFO.SUM_SCR) + MIN(HEADER_INFO.SUM_SCR)) AS TOTAL_SUM_SCR,
+				      	(SUM(HEADER_INFO.SUM_SCR) - (MAX(HEADER_INFO.SUM_SCR) + MIN(HEADER_INFO.SUM_SCR)))/(COUNT(HEADER_INFO.BDD_CMP_ID)-2) AS TOTAL_AVG_SCR,
+				      	MAX(HEADER_INFO.SUM_SCR) AS MAX_SCR,
+				      	MIN(HEADER_INFO.SUM_SCR) AS MIN_SCR
+				FROM (
+		   				SELECT
+						      ERS.BDD_CMP_ID ,
+						      EBC.BDD_CMP_NM ,
+						      SUM(ERIS.SCR) AS SUM_SCR
+					   	FROM EVAL_SHT ES 
+					   	INNER JOIN EVAL_RTR_SHT ERS ON ES.SHT_ID  = ERS.SHT_ID 
+					   	INNER JOIN EVAL_RTR ER ON ERS.RTR_ID = ER.RTR_ID 
+					   	INNER JOIN EVAL_BDD_CMP EBC ON ERS.BDD_CMP_ID = EBC.BDD_CMP_ID 
+					   	INNER JOIN EVAL_RTR_ITEM_SCR ERIS ON ERS.RTR_SHT_ID = ERIS.RTR_SHT_ID
+					   	WHERE ES.SHT_INFO_ID = #{shtInfoId}
+					   	<if test="shtType != null and shtType != '' and shtType != 'all'">
+					   	AND ES.SHT_ID = #{shtId}
+					   	</if>
+					   	GROUP BY ER.RTR_ID ,ERS.BDD_CMP_ID , EBC.BDD_CMP_NM  , EBC.BDD_CMP_NBR 
+					   	ORDER BY EBC.BDD_CMP_NBR  ASC
+					)  	HEADER_INFO    
+				GROUP BY HEADER_INFO.BDD_CMP_ID , HEADER_INFO.BDD_CMP_NM
+		) HEADER_LIST_INFO
+	</select>
+	
+	<select id="findAllRsultRtrScrInfoByShtInfoIdAndShtId" parameterType="map" resultType="com.neighbor21.ggits.evaluation.common.dto.EvalResultDTO$EvalResultRtrInfo">
+		SELECT 
+		      RATER_SCR_INFO.RTR_NM, 
+		      GROUP_CONCAT(RATER_SCR_INFO.SUM_SCR) AS SUM_LIST
+		FROM (
+				SELECT
+			      	ER.RTR_ID , 
+			      	<if test="shtType != null and shtType != '' and shtType != 'all'">
+						ES.SHT_ID,
+				      	ERS.RTR_SHT_ID , 
+			      	</if>
+			      	ERS.BDD_CMP_ID ,
+			      	ER.RTR_NM ,
+			      	EBC.BDD_CMP_NM ,
+			      	SUM(ERIS.SCR) AS SUM_SCR
+			   	FROM EVAL_SHT ES 
+			   	INNER JOIN EVAL_RTR_SHT ERS ON ES.SHT_ID  = ERS.SHT_ID 
+			   	INNER JOIN EVAL_RTR ER ON ERS.RTR_ID = ER.RTR_ID 
+			   	INNER JOIN EVAL_BDD_CMP EBC ON ERS.BDD_CMP_ID = EBC.BDD_CMP_ID 
+			   	INNER JOIN EVAL_RTR_ITEM_SCR ERIS ON ERS.RTR_SHT_ID = ERIS.RTR_SHT_ID
+			   	WHERE ES.SHT_INFO_ID = #{shtInfoId}
+			   	<if test="shtType != null and shtType != '' and shtType != 'all'">
+				AND ES.SHT_ID = #{shtId}
+				</if>
+			   	GROUP BY
+			   				<if test="shtType != null and shtType != '' and shtType != 'all'"> 	
+			   				ES.SHT_ID,
+			   				ERS.RTR_SHT_ID , 
+			   				</if>
+			   				ER.RTR_ID , 
+			   				ER.RTR_NM , 
+			            	ERS.BDD_CMP_ID , 
+			            	EBC.BDD_CMP_NM  , 
+			            	EBC.BDD_CMP_NBR 
+			   ORDER BY EBC.BDD_CMP_NBR  ASC
+		) RATER_SCR_INFO    
+		GROUP BY RATER_SCR_INFO.RTR_ID
+		ORDER BY RATER_SCR_INFO.RTR_NM
+	</select>
+	
+	<select id="findOneMaxMinRtrId" parameterType="map" resultType="com.neighbor21.ggits.evaluation.common.dto.EvalResultDTO$EvalMaxMinScrInfo">
+		SELECT
+			MAX_MIN_INFO.SHT_ID,
+			MAX_MIN_INFO.MAX_SCR,
+			(
+				SELECT MAX_INFO.RTR_ID FROM (
+				SELECT
+					RTR_ID,
+					SUM(MAX_ERIS.SCR) AS MAX_SCR
+				FROM
+					EVAL_RTR_SHT MAX_ERS
+				INNER JOIN EVAL_RTR_ITEM_SCR MAX_ERIS ON
+					MAX_ERS.RTR_SHT_ID = MAX_ERIS.RTR_SHT_ID
+				WHERE
+					MAX_ERS.SHT_ID = MAX_MIN_INFO.SHT_ID
+				GROUP BY RTR_ID
+				) MAX_INFO
+				ORDER BY MAX_INFO.MAX_SCR DESC, MAX_INFO.RTR_ID DESC
+				LIMIT 1
+			) AS MAX_RTR_ID,
+			MAX_MIN_INFO.MIN_SCR,
+			(
+				SELECT MAX_INFO.RTR_ID FROM (
+				SELECT
+					RTR_ID,
+					SUM(MAX_ERIS.SCR) AS MAX_SCR
+				FROM
+					EVAL_RTR_SHT MAX_ERS
+				INNER JOIN EVAL_RTR_ITEM_SCR MAX_ERIS ON
+					MAX_ERS.RTR_SHT_ID = MAX_ERIS.RTR_SHT_ID
+				WHERE
+					MAX_ERS.SHT_ID = MAX_MIN_INFO.SHT_ID
+				GROUP BY RTR_ID
+				) MAX_INFO
+				ORDER BY MAX_INFO.MAX_SCR ASC, MAX_INFO.RTR_ID DESC
+				LIMIT 1
+			) AS MIN_RTR_ID
+		FROM
+			(
+			SELECT
+				SCR_INFO.SHT_ID ,
+					MAX(SCR_INFO.SUM_SCR) AS MAX_SCR, 
+					MIN(SCR_INFO.SUM_SCR) AS MIN_SCR
+			FROM
+				(
+				SELECT
+						ERS.RTR_ID,
+						ERS.SHT_ID,
+						SUM(ERIS.SCR) AS SUM_SCR
+				FROM
+						EVAL_RTR_SHT ERS
+				INNER JOIN EVAL_RTR_ITEM_SCR ERIS ON
+					ERS.RTR_SHT_ID = ERIS.RTR_SHT_ID
+				WHERE
+					ERS.SHT_ID = #{shtId}
+				GROUP BY
+					ERS.RTR_ID ,
+					ERS.SHT_ID
+					)SCR_INFO
+			GROUP BY
+				SCR_INFO.SHT_ID
+			) MAX_MIN_INFO
+	
+	</select>
+</mapper>

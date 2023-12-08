@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN' 'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace='com.neighbor21.ggits.evaluation.common.mapper.EvalShtSctrMapper'>
+
+	<delete id="deleteByShtSctrId" parameterType="String">
+		DELETE FROM EVAL_SHT_SCTR WHERE SHT_SCTR_ID = #{shtSctrId}
+	</delete>
+	
+	<select id="findAllByShtId" parameterType="String" resultType="evalShtSctr">
+		SELECT	
+				SHT_SCTR_ID,
+				SHT_ID,
+				FLD_SCTR,
+				FLD_ORDR
+		FROM	EVAL_SHT_SCTR
+		WHERE	SHT_ID = #{shtId}
+		ORDER BY FLD_ORDR ASC
+	</select>
+	
+	<insert id="save" parameterType="evalShtSctr">
+		INSERT INTO EVAL_SHT_SCTR(
+								SHT_SCTR_ID, 
+								SHT_ID, 
+								FLD_SCTR, 
+								FLD_ORDR
+								)VALUES(
+								#{shtSctrId}, 
+								#{shtId}, 
+								#{fldSctr}, 
+								#{fldOrdr}
+								);
+					
+	</insert>
+	
+	<update id="update" parameterType="evalShtSctr">
+		UPDATE 
+				EVAL_SHT_SCTR
+		SET 	SHT_ID			= #{shtId}, 
+				FLD_SCTR		= #{fldSctr}, 
+				FLD_ORDR		= #{fldOrdr}
+		WHERE 	SHT_SCTR_ID		= #{shtSctrId}
+	</update>
+</mapper>

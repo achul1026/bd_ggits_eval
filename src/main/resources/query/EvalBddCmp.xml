@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN' 'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace='com.neighbor21.ggits.evaluation.common.mapper.EvalBddCmpMapper'>
+
+
+	<insert id="save" parameterType="evalBddCmp">
+		INSERT INTO EVAL_BDD_CMP(
+								BDD_CMP_ID, 
+								SHT_INFO_ID, 
+								BDD_CMP_NM, 
+								BDD_CMP_NBR
+								)VALUES(
+								#{bddCmpId}, 
+								#{shtInfoId}, 
+								#{bddCmpNm}, 
+								#{bddCmpNbr}
+								);
+	</insert>
+	
+	<delete id="deleteByShtInfoId" parameterType="String">
+		DELETE FROM EVAL_BDD_CMP WHERE SHT_INFO_ID = #{shtInfoId}
+	</delete>
+	
+	<delete id="deleteByBddCmpId" parameterType="String">
+		DELETE FROM EVAL_BDD_CMP WHERE BDD_CMP_ID = #{bddCmpId}
+	</delete>
+	
+	<select id="findAllJoinEvalShtByShtInfoId" parameterType="String" resultType="map">
+		SELECT
+			ebc.BDD_CMP_ID 	AS "bddCmpId", 
+			es.SHT_ID  		AS "shtId"
+		FROM
+			EVAL_BDD_CMP ebc  
+		INNER JOIN EVAL_SHT es ON ebc.SHT_INFO_ID  = es.SHT_INFO_ID 
+		WHERE ebc.SHT_INFO_ID = #{shtInfoId}
+		GROUP BY ebc.BDD_CMP_ID , es.SHT_ID 
+	</select>
+	
+	<select id="findAllByShtInfoId" parameterType="String" resultType="evalBddCmp">
+		SELECT 
+				BDD_CMP_ID, 
+				SHT_INFO_ID, 
+				BDD_CMP_NM, 
+				BDD_CMP_NBR
+		FROM 	EVAL_BDD_CMP
+		WHERE 	SHT_INFO_ID = #{shtInfoId}
+		ORDER BY BDD_CMP_NBR ASC
+	</select>
+	
+	<select id="findOneByBddCmpId" parameterType="String" resultType="evalBddCmp">
+		SELECT 
+				BDD_CMP_ID, 
+				SHT_INFO_ID, 
+				BDD_CMP_NM, 
+				BDD_CMP_NBR
+		FROM 	EVAL_BDD_CMP
+		WHERE 	BDD_CMP_ID = #{bddCmpId}
+	</select>
+	
+	<update id="update" parameterType="evalBddCmp">
+		UPDATE 
+				EVAL_BDD_CMP
+		SET 	 
+				BDD_CMP_NM=#{bddCmpNm}, 
+				BDD_CMP_NBR=#{bddCmpNbr}
+		WHERE 	BDD_CMP_ID=#{bddCmpId}
+	</update>
+	
+	<select id="findAllBddCmpByShtInfoIdOrderByCmpNbr" parameterType="evalShtInfo" resultType="evalBddCmp">
+		SELECT 
+				ebc.BDD_CMP_ID,
+				ebc.BDD_CMP_NM,
+				ebc.BDD_CMP_NBR
+		FROM EVAL_BDD_CMP ebc 
+		WHERE ebc.SHT_INFO_ID = #{shtInfoId}
+		ORDER BY ebc.BDD_CMP_NBR DESC
+		<if test="pageNo != null ">
+		LIMIT 3 OFFSET #{pageNo}    	
+		</if>
+	</select>
+	
+	<select id="countAllBddCmpByShtInfoId" parameterType="String" resultType="int">
+		SELECT 
+				COUNT(*)
+		FROM 	EVAL_BDD_CMP ebc 
+		WHERE 	ebc.SHT_INFO_ID  = #{shtInfoId}
+	</select>
+	
+	<select id="findOneBddCmpByShtInfoIdOrderByCmpNbrGroupByBddCmpNm" parameterType="String" resultType="evalBddCmp">
+		SELECT 
+				GROUP_CONCAT(ebc.BDD_CMP_NM ORDER BY ebc.BDD_CMP_NBR) AS BDD_CMP_NM 
+		FROM EVAL_BDD_CMP ebc 
+		WHERE ebc.SHT_INFO_ID = #{shtInfoId}
+	</select>
+	
+	<select id="findAllCmpInfoByShtInfoId" parameterType="String" resultType="String">
+		SELECT BDD_CMP_ID
+		FROM EVAL_BDD_CMP
+		WHERE SHT_INFO_ID = #{shtInfoId}
+	</select>
+
+</mapper>

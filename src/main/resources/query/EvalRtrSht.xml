@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN' 'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace='com.neighbor21.ggits.evaluation.common.mapper.EvalRtrShtMapper'>
+
+	<insert id="save" parameterType="evalRtrSht">
+		INSERT INTO EVAL_RTR_SHT(
+									RTR_SHT_ID, 
+									SHT_ID, 
+									RTR_ID, 
+									FILE_ID, 
+									BDD_CMP_ID, 
+									SHT_STTS 
+									)VALUES(
+									#{rtrShtId}, 
+									#{shtId}, 
+									#{rtrId}, 
+									#{fileId}, 
+									#{bddCmpId}, 
+									#{shtStts} 
+									)
+		
+	</insert>
+	
+	<select id="findAllRtrShtByRtrIdAndBddCmpId" parameterType="String" resultType="evalRtrSht">
+		SELECT 
+				ers.SHT_STTS,
+				ers.SHT_SV_DT,
+				ers.RTR_SHT_ID,
+				ers.SHT_ID,
+				ers.BDD_CMP_ID 
+		FROM 	EVAL_RTR_SHT ers
+		INNER JOIN 
+				EVAL_SHT es
+				on ers.SHT_ID = es.SHT_ID
+		WHERE 
+				ers.RTR_ID = #{rtrId}
+		AND ers.BDD_CMP_ID = #{bddCmpId}
+		AND es.SHT_TYPE = #{shtType}
+	</select>
+	
+	<select id="findAllJoinEvalShtByBddCmpIdAndRtrId" parameterType="String" resultType="evalRtrSht">
+		SELECT 
+				ers.SHT_STTS,
+				ers.SHT_ID,
+				ers.RTR_SHT_ID 
+		FROM 
+				EVAL_RTR_SHT ers 
+		INNER JOIN EVAL_SHT es ON(ers.SHT_ID = es.SHT_ID)
+		WHERE 
+				ers.BDD_CMP_ID = #{bddCmpId}
+		AND 	ers.RTR_ID = #{rtrId}
+	</select>
+	
+	<update id="updateShtSttsByRtrShtId" parameterType="evalRtrSht">
+		UPDATE	EVAL_RTR_SHT ers
+		SET 
+				ers.SHT_STTS = #{shtStts},
+				ers.SHT_SV_DT = NOW()
+		WHERE 	ers.RTR_SHT_ID = #{rtrShtId}
+	</update>
+	
+	<update id="updateFileIdByRtrShtId" parameterType="evalRtrSht">
+		UPDATE	EVAL_RTR_SHT ers
+		SET 
+				ers.FILE_ID = #{fileId}
+		WHERE 	ers.RTR_SHT_ID = #{rtrShtId}
+	</update>
+	
+	
+	<select id="findAllRtrShtByRtrShtId" parameterType="String" resultType="evalRtrSht"> 
+		SELECT
+				RTR_SHT_ID, 
+				SHT_ID, 
+				RTR_ID, 
+				FILE_ID, 
+				BDD_CMP_ID, 
+				SHT_STTS
+		FROM	EVAL_RTR_SHT
+		WHERE 	RTR_SHT_ID = #{rtrShtId} 
+	</select>
+	
+	<select id="countAllByRtrIdAndShtInfoIdAndShtStts" parameterType="string" resultType="int">
+		SELECT 
+				COUNT(*)
+		FROM 	EVAL_RTR_SHT ers 
+		INNER 	JOIN EVAL_SHT es ON(ers.SHT_ID = es.SHT_ID)
+		WHERE 
+				ers.RTR_ID = #{rtrId}
+		AND 	es.SHT_INFO_ID = #{shtInfoId}
+		AND 	ers.SHT_STTS = #{shtStts}
+	</select>
+	
+	<select id="counAllByshtTypeAndShtInfoIdAndRtrIdAndShtStts" parameterType="string" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			EVAL_RTR_SHT ers
+		INNER JOIN EVAL_SHT es ON
+			ers.SHT_ID = es.SHT_ID
+		WHERE 
+			es.SHT_TYPE = #{shtType}
+		AND es.SHT_INFO_ID = #{shtInfoId}
+		AND ers.RTR_ID = #{rtrId}
+		and ers.SHT_STTS = #{shtStts}
+	</select>
+	
+	<select id="findAllJoinEvalShtByRtrIdAndShtInfoId" parameterType="String" resultType="EvalRtrSht">
+		SELECT 	ers.RTR_SHT_ID 
+		FROM 	EVAL_RTR_SHT ers 
+		INNER 	JOIN EVAL_SHT es ON (ers.SHT_ID = es.SHT_ID)
+		WHERE 
+				ers.RTR_ID = #{rtrId}
+		AND 	es.SHT_INFO_ID = #{shtInfoId}
+	</select>
+	
+	<select id="findAllJoinEvalShtByShtTypeAndBddCmpIdAndShtInfoId" parameterType="String" resultType="EvalRtrSht">
+		SELECT
+			ers.RTR_SHT_ID 
+		FROM 
+			EVAL_RTR_SHT ers
+		INNER JOIN 
+			EVAL_SHT es 
+		ON
+			ers.SHT_ID = es.SHT_ID
+		WHERE 
+			es.SHT_TYPE = #{shtType}
+			AND 
+			ers.BDD_CMP_ID = #{bddCmpId}
+			AND 
+			es.SHT_INFO_ID = #{shtInfoId}
+	</select>
+	
+	<delete id="deleteByRtrShtId" parameterType="EvalRtrSht">
+		DELETE
+    	FROM	EVAL_RTR_SHT 
+		WHERE 	RTR_SHT_ID = #{rtrShtId}
+	</delete>
+	
+	<delete id="deleteByBddCmpId" parameterType="EvalRtrSht">
+		DELETE
+    	FROM	EVAL_RTR_SHT 
+		WHERE 	BDD_CMP_ID = #{bddCmpId}
+	</delete>
+</mapper>

@@ -1,0 +1,33 @@
+@charset 'utf-8';
+
+@font-face {
+	font-family: 'batang';
+	font-weight: 900;
+	font-display: swap;
+	src: url('../fonts/Batang_Bold.woff') format('woff');
+}
+@font-face {
+	font-family: 'batang';
+	font-weight: 600;
+	font-display: swap;
+	src:url('../fonts/Batang_Regular.woff') format('woff');
+}
+@font-face {
+	font-family: 'Title';
+	font-weight: 900;
+	font-display: swap;
+	src:url('../fonts/Title_Bold.woff') format('woff');
+}
+@font-face {
+	font-family: 'Title';
+	font-weight: 700;
+	font-display: swap;
+	src:url('../fonts/Title_Medium.woff') format('woff');
+}
+@font-face {
+	font-family: 'Title';
+	font-weight: 300;
+	font-display: swap;
+	src:url('../fonts/Title_Light.woff') format('woff');
+}
+

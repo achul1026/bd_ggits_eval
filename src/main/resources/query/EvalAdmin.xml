@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN' 'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace='com.neighbor21.ggits.evaluation.common.mapper.EvalAdminMapper'>
+	
+	<select id="findOneEvalAdminByUserId" parameterType="evalAdmin" resultType="evalAdmin">
+		SELECT 
+			USER_ID,
+			USER_PW
+		FROM EVAL_ADMIN
+		WHERE
+			USER_ID = #{userId}
+	</select>
+	
+	<select id="countAll" resultType="int">
+		SELECT COUNT(*)
+		FROM EVAL_ADMIN
+	</select>
+	
+	<insert id="save" parameterType="EvalAdmin">
+		INSERT INTO EVAL_ADMIN (
+			ADMIN_ID,
+			USER_ID,
+			USER_PW
+			) VALUES (
+			#{adminId}, 
+			#{userId}, 
+			#{userPw}
+			)
+	</insert>
+</mapper>

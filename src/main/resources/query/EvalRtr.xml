@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN' 'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace='com.neighbor21.ggits.evaluation.common.mapper.EvalRtrMapper'>
+
+	<select id="findAllRtrByShtInfoId" parameterType="String" resultType="evalRtr">
+		SELECT  
+				er.RTR_ID,
+				er.RTR_NM,
+				er.RTR_AGNCY ,
+				er.RTR_TEL
+		FROM    EVAL_RTR er 
+				INNER JOIN EVAL_RTR_LIST erl ON(er.RTR_ID = erl.RTR_ID)
+		WHERE 	erl.SHT_INFO_ID = #{shtInfoId}
+		ORDER BY er.CRT_DT DESC
+	</select>
+
+	<select id="findOneRtrByBirtDt" parameterType="evalRtr" resultType="evalRtr">
+		SELECT 
+				er.RTR_ID, 
+				er.RTR_NM, 
+				er.RTR_AGNCY,
+				er.RTR_TEL  
+		FROM EVAL_RTR er 
+		WHERE 
+			er.RTR_BRTH_DT = #{rtrBrthDt}
+		AND er.RTR_ID = #{rtrId}
+	</select>
+	
+	<select id="findAll" parameterType="evalRtr" resultType="evalRtr">
+		SELECT 
+				ER.RTR_ID, 
+				ER.RTR_NM, 
+				ER.RTR_BRTH_DT, 
+				ER.RTR_TEL,
+				<if test="shtInfoId != null and shtInfoId != ''">
+				(CASE WHEN (SELECT 
+									COUNT(*) 
+							FROM 	EVAL_RTR_LIST ERL 
+							WHERE 	ERL.RTR_ID = ER.RTR_ID 
+							AND 	SHT_INFO_ID = #{shtInfoId}) = 1 
+						THEN 'TRUE' 
+					  	ELSE 'FALSE' 
+					  	END 
+				) AS 'rtrExist',
+				</if>
+				ER.RTR_AGNCY
+		FROM 	EVAL_RTR ER
+		WHERE 	1=1
+		<if test="rtrId != null and rtrId != ''">
+		AND		ER.RTR_ID = #{rtrId}
+		</if>
+		<if test="schRtrNm != null and schRtrNm != ''">
+		AND		ER.RTR_NM LIKE CONCAT('%',#{schRtrNm},'%')
+		</if>
+		ORDER BY ER.CRT_DT DESC
+		<if test="pageNo != null">
+		LIMIT 5 OFFSET #{pageNo}  	    	
+		</if>
+	</select>
+	
+	<select id="countAll" resultType="int">
+		SELECT 
+				COUNT(*)
+		FROM 	EVAL_RTR
+		WHERE 	1=1
+		<if test="rtrId != null and rtrId != ''">
+		AND		RTR_ID = #{rtrId}
+		</if>
+		<if test="schRtrNm != null and schRtrNm != ''">
+		AND		RTR_NM LIKE CONCAT('%',#{schRtrNm},'%')
+		</if>
+	</select>
+	
+	<select id="findAllJoinEvalRtrList" parameterType="evalRtrList" resultType="evalRtr">
+		SELECT  
+				ER.RTR_ID, 
+				ER.RTR_NM, 
+				ER.RTR_BRTH_DT, 
+				ER.RTR_AGNCY,
+				ER.RTR_TEL,
+				ERL.EVAL_CMPLT
+		FROM 
+		EVAL_RTR ER
+		INNER JOIN EVAL_RTR_LIST ERL ON ER.RTR_ID = ERL.RTR_ID 
+		WHERE ERL.SHT_INFO_ID = #{shtInfoId}
+		<if test="evalCmplt != null and evalCmplt != '' and evalCmplt != 'all' ">
+		AND ERL.EVAL_CMPLT = #{evalCmplt}
+		</if>
+		ORDER BY ER.CRT_DT DESC
+	</select>
+	
+	<insert id="save" parameterType="evalRtr">
+		INSERT INTO EVAL_RTR(
+								RTR_ID, 
+								RTR_NM, 
+								RTR_BRTH_DT, 
+								RTR_AGNCY, 
+								RTR_TEL,
+								CRT_DT
+							)VALUES(
+								#{rtrId}, 
+								#{rtrNm}, 
+								#{rtrBrthDt}, 
+								#{rtrAgncy}, 
+								#{rtrTel},
+								NOW()
+							)
+	</insert>
+	<update id="update" parameterType="evalRtr">
+		UPDATE 
+				EVAL_RTR
+		SET		RTR_NM		=	#{rtrNm}, 
+				RTR_BRTH_DT	=	#{rtrBrthDt}, 
+				RTR_AGNCY	=	#{rtrAgncy}, 
+				RTR_TEL		=	#{rtrTel}
+		WHERE 	RTR_ID		=	#{rtrId}
+	</update>
+	
+	<select id="findOneEvalRtrDuplChk" parameterType="evalRtr" resultType="int">
+		SELECT 
+				COUNT(*) 
+		FROM	EVAL_RTR
+		WHERE 	RTR_NM		=	#{rtrNm} 
+		AND		RTR_BRTH_DT	=	#{rtrBrthDt}
+		AND		RTR_AGNCY	=	#{rtrAgncy} 
+		AND		RTR_TEL		=	#{rtrTel}
+	</select>
+</mapper>

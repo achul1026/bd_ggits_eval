@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN' 'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace='com.neighbor21.ggits.evaluation.common.mapper.EvalShtQntScrMapper'>
+
+	<delete id="deleteByShtItmId" parameterType="String">
+		DELETE FROM EVAL_SHT_QNT_SCR WHERE SHT_ITM_ID = #{shtItmId}
+	</delete>
+	
+	<insert id="save" parameterType="evalShtQntScr">
+		INSERT INTO EVAL_SHT_QNT_SCR(
+									QNT_SCR_ID, 
+									SHT_ITM_ID, 
+									FLD_SCR
+									)VALUES(
+									#{qntScrId}, 
+									#{shtItmId}, 
+									#{fldScr}
+									)
+
+	</insert>
+	
+	<select id="findOneByShtItmId" parameterType="String" resultType="evalShtQntScr">
+		SELECT 
+				QNT_SCR_ID, 
+				SHT_ITM_ID, 
+				FLD_SCR
+		FROM 	EVAL_SHT_QNT_SCR
+		WHERE	SHT_ITM_ID = #{shtItmId}
+	</select>
+	
+	<update id="update" parameterType="evalShtQntScr">
+		UPDATE 
+				EVAL_SHT_QNT_SCR
+		SET 	SHT_ITM_ID = #{shtItmId}, 
+				FLD_SCR = #{fldScr}
+		WHERE 	QNT_SCR_ID = #{qntScrId}
+		
+	</update>
+	
+	<select id="findAllByShtItmId" parameterType="String" resultType="evalShtQntScr">
+		SELECT 
+				QNT_SCR_ID, 
+				SHT_ITM_ID, 
+				SCR_NM, SCR, 
+				SCR_ORDR
+		FROM 	EVAL_SHT_QNT_SCR
+		WHERE	SHT_ITM_ID= #{shtItmId}
+		ORDER BY SCR_ORDR ASC
+	</select>
+</mapper>

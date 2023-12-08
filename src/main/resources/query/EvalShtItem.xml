@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE mapper PUBLIC '-//mybatis.org//DTD Mapper 3.0//EN' 'http://mybatis.org/dtd/mybatis-3-mapper.dtd'>
+
+<mapper namespace='com.neighbor21.ggits.evaluation.common.mapper.EvalShtItemMapper'>
+
+
+	<select id="findAllByShtSctrId" parameterType="String" resultType="evalShtItem">
+		SELECT 
+				SHT_ITM_ID, 
+				SHT_SCTR_ID, 
+				ITM_NM, 
+				ITM_ELMNT, 
+				ITEM_ORDR
+		FROM 	EVAL_SHT_ITEM
+		WHERE	SHT_SCTR_ID = #{shtSctrId}
+		ORDER BY ITEM_ORDR ASC
+	</select>
+	
+	<insert id="save" parameterType="evalShtItem">
+		INSERT INTO EVAL_SHT_ITEM(
+									SHT_ITM_ID, 
+									SHT_SCTR_ID, 
+									ITM_NM, 
+									ITM_ELMNT, 
+									ITEM_ORDR
+									)VALUES(
+									#{shtItmId}, 
+									#{shtSctrId}, 
+									#{itmNm}, 
+									#{itmElmnt}, 
+									#{itemOrdr}
+									)
+				
+	</insert>
+	
+	<update id="update" parameterType="evalShtItem">
+		UPDATE 
+				EVAL_SHT_ITEM
+		SET 	 
+				ITM_NM=#{itmNm}, 
+				ITM_ELMNT=#{itmElmnt}, 
+				ITEM_ORDR=#{itemOrdr}
+		WHERE 	SHT_ITM_ID=#{shtItmId}
+				
+	</update>
+	
+	<delete id="deleteByShtItmId" parameterType="String">
+		DELETE FROM EVAL_SHT_ITEM WHERE SHT_ITM_ID = #{shtItmId}
+	</delete>
+</mapper>
