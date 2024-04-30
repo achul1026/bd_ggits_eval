@@ -13,7 +13,7 @@
 		<div class="content-head">
 			<img src="${pageContext.request.contextPath}/statics/images/logo.png"
 				class="logo">
-			<h1>평가지 목록</h1>
+			<h1>경기도 제안평가 목록</h1>
 
 			<div class="status" id="statusCntDiv">
 				<ul>
@@ -46,7 +46,7 @@
 
 		<div class="btn-wrap">
 			<button type="button" id="saveEvalBtn" class="btn-make">평가지 생성</button>
-			<button type="button" class="btn-make"onclick="fnSaveRaterList();"> 평가자 관리</button>
+			<button type="button" class="btn-make"onclick="fnRaterList('', '', 'save');"> 제안평가위원 관리</button>
 		</div>
 
 		<div class="list-wrap" id="listDiv">
@@ -78,16 +78,16 @@
 												evalShtInfoList.shtAllStts eq 'ESC002' or
 												evalShtInfoList.shtAllStts eq 'ESC003'or
 												evalShtInfoList.shtAllStts eq 'ESC004'}">
-									[작성 중]
+									작성 중
 								</c:when>
 								<c:when test="${evalShtInfoList.shtAllStts eq 'ESC005'}">
-									[대기]
+									대기
 								</c:when>
 								<c:when test="${evalShtInfoList.shtAllStts eq 'ESC006'}">
-									[평가 중]
+									평가 중
 								</c:when>
 								<c:otherwise>
-									[완료]
+									완료
 								</c:otherwise>
 							</c:choose>
 						</span>
@@ -109,10 +109,17 @@
 							<img src="${pageContext.request.contextPath}/statics/images/gear.png" class="option">
 							<div class="option-list">
 								<ul>
+									<c:if test="${evalShtInfoList.shtAllStts eq 'ESC000' or 
+												evalShtInfoList.shtAllStts eq 'ESC006'or 
+ 												evalShtInfoList.shtAllStts eq 'ESC005'or 
+												evalShtInfoList.shtAllStts eq 'ESC007'or 
+ 												evalShtInfoList.shtAllStts eq 'ESC008' 
+ 												}"> 
 									<li onclick="fnDetailView('${evalShtInfoList.shtInfoId}','${evalShtInfoList.shtAllStts}')">
 										<img src="${pageContext.request.contextPath}/statics/images/detail.png">
 										<span>평가지 상세</span> 
 									</li>
+									</c:if>
 									<!-- 평가대기 / 평가지 작성중일 경우  -->
 									<c:if test="${evalShtInfoList.shtAllStts eq 'ESC001' or 
 												evalShtInfoList.shtAllStts eq 'ESC002' or
@@ -120,7 +127,7 @@
 												evalShtInfoList.shtAllStts eq 'ESC004'or
 												evalShtInfoList.shtAllStts eq 'ESC005'
 												}">
-										<li onclick="fnEvalInfoUpdate('${evalShtInfoList.shtInfoId}')">
+										<li onclick="fnEvalInfoUpdate('${evalShtInfoList.shtInfoId}','${evalShtInfoList.shtAllStts}')">
 											<img src="${pageContext.request.contextPath}/statics/images/pen.png">
 											<span>평가지 수정</span> 
 										</li>
@@ -131,18 +138,18 @@
 											<img src="${pageContext.request.contextPath}/statics/images/code.png">
 											<span>참여 코드 변경</span> 
 										</li>
-										<li class="tester-list-on-btn" onclick="fnRaterList('${evalShtInfoList.shtInfoId}')">
+										<li class="" onclick="fnRaterList('${evalShtInfoList.shtInfoId}', '', 'list')">
 											<img src="${pageContext.request.contextPath}/statics/images/registration.png">
 											<span>평가자 등록</span> 
 										</li>
 <%-- 										<li class="tester-list-on-btn" onclick="location.href='${pageContext.request.contextPath}/evaluation/management/eval/list.do?shtInfoId=${evalShtInfoList.shtInfoId}&shtNm=${evalShtInfoList.shtNm}'"> --%>
-										<li class="tester-list-on-btn" onclick="fnViewEvalList('${evalShtInfoList.shtInfoId}', '${evalShtInfoList.shtNm}')">
+										<li class="" onclick="fnViewEvalList('${evalShtInfoList.shtInfoId}', '${evalShtInfoList.shtNm}')">
 											<img src="${pageContext.request.contextPath}/statics/images/test.png">
 											<span>평가하기</span> 
 										</li>
 									</c:if>
 									<!-- 평가 완료일 경우 -->
-									<c:if test="${evalShtInfoList.shtAllStts eq 'ESC000'}">
+									<c:if test="${evalShtInfoList.shtAllStts eq 'ESC000' or evalShtInfoList.shtAllStts eq 'ESC007' or evalShtInfoList.shtAllStts eq 'ESC008'}">
 										<li onclick="fnEvalInfoCopy('${evalShtInfoList.shtInfoId}')">
 											<img src="${pageContext.request.contextPath}/statics/images/recicle.png">
 											<span>재사용</span> 
@@ -151,7 +158,9 @@
 									<!-- 평가지 작성중 경우 -->
 									<c:if test="${evalShtInfoList.shtAllStts eq 'ESC001' or 
 												evalShtInfoList.shtAllStts eq 'ESC002' or
-												evalShtInfoList.shtAllStts eq 'ESC003'}">
+												evalShtInfoList.shtAllStts eq 'ESC003' or
+												evalShtInfoList.shtAllStts eq 'ESC004' or
+												evalShtInfoList.shtAllStts eq 'ESC005'}">
 										<li onclick="fnEvalInfoDelete('${evalShtInfoList.shtInfoId}')">
 											<img src="${pageContext.request.contextPath}/statics/images/delete.png">
 											<span>삭제</span> 
@@ -159,7 +168,7 @@
 									</c:if>
 									<!-- 평가지 진행중 경우 -->
 									<c:if test="${evalShtInfoList.shtAllStts eq 'ESC006'}">
-										<li class="tester-list-on-btn" onclick="fnViewEvalList('${evalShtInfoList.shtInfoId}', '${evalShtInfoList.shtNm}')">
+										<li class="" onclick="fnViewEvalList('${evalShtInfoList.shtInfoId}', '${evalShtInfoList.shtNm}')">
 											<img src="${pageContext.request.contextPath}/statics/images/test.png">
 											<span>평가하기</span> 
 										</li>
@@ -175,7 +184,7 @@
 	</div>
 </div>
 
-<div class="sign-wrap tester-list-wrap">
+<div class="sign-wrap tester-list-wrap mx500">
 			
 </div>
 <script>
@@ -250,13 +259,13 @@
 						
 						tableHtml += '	<span>';
 						if(shtAllStts == 'ESC001' || shtAllStts == 'ESC002' || shtAllStts == 'ESC003' || shtAllStts == 'ESC004') {
-							tableHtml += '				[작성 중]';
+							tableHtml += '				작성 중';
 						} else if(shtAllStts == 'ESC005') {
-							tableHtml += '				[대기]';
+							tableHtml += '				대기';
 						} else if(shtAllStts == 'ESC006') {
-							tableHtml += '				[평가 중]';
+							tableHtml += '				평가 중';
 						} else {
-							tableHtml += '				[완료]';
+							tableHtml += '				완료';
 						}
 						tableHtml += '	</span>';
 						tableHtml += '	</div>';
@@ -280,13 +289,15 @@
 						tableHtml += '				<img src="${pageContext.request.contextPath}/statics/images/gear.png" class="option">';
 						tableHtml += '				<div class="option-list">';
 						tableHtml += '					<ul>';
-						tableHtml += '         				<li onclick="fnDetailView(\''+shtInfoId+'\',\''+shtAllStts+'\')">';
-						tableHtml += '          				<img src="${pageContext.request.contextPath}/statics/images/detail.png">';
-						tableHtml += '           				<span>평가지 상세</span>';
-						tableHtml += '         				</li>';
+						if(shtAllStts == 'ESC000' || shtAllStts == 'ESC005' || shtAllStts == 'ESC006' || shtAllStts == 'ESC007' || shtAllStts == 'ESC008'){
+							tableHtml += '         				<li onclick="fnDetailView(\''+shtInfoId+'\',\''+shtAllStts+'\')">';
+							tableHtml += '          				<img src="${pageContext.request.contextPath}/statics/images/detail.png">';
+							tableHtml += '           				<span>평가지 상세</span>';
+							tableHtml += '         				</li>';
+						}
 						//완료가 아니면
 						if(shtAllStts == 'ESC001' || shtAllStts == 'ESC002' || shtAllStts == 'ESC003' || shtAllStts == 'ESC004' || shtAllStts == 'ESC005'){
-							tableHtml += ' <li onclick="fnEvalInfoUpdate('+shtInfoId+')">';
+							tableHtml += ' <li onclick="fnEvalInfoUpdate('+shtInfoId+',\''+shtAllStts+'\')">';
 							tableHtml += '<img src="${pageContext.request.contextPath}/statics/images/pen.png">';
 							tableHtml += '<span>평가지 수정</span> ';
 							tableHtml += '</li>';
@@ -297,16 +308,18 @@
 								tableHtml += '		<img src="${pageContext.request.contextPath}/statics/images/code.png">';
 								tableHtml += ' 		<span>참여 코드 변경</span> ';
 								tableHtml += ' </li>';
-								tableHtml += ' <li class="tester-list-on-btn" onclick="fnRaterList(\''+shtInfoId+'\')">';
+								tableHtml += ' <li onclick="fnRaterList(\''+shtInfoId+'\', \'\', \'list\')">';
 								tableHtml += '		<img src="${pageContext.request.contextPath}/statics/images/registration.png">';
 								tableHtml += ' 		<span>평가자 등록</span> ';
 								tableHtml += ' </li>';
-								tableHtml += ' <li class="tester-list-on-btn" onclick="fnViewEvalList(\''+shtInfoId+'\', \''+shtNm+'\')">';
+								tableHtml += ' <li onclick="fnViewEvalList(\''+shtInfoId+'\', \''+shtNm+'\')">';
 								tableHtml += '		<img src="${pageContext.request.contextPath}/statics/images/test.png">';
 								tableHtml += ' 		<span>평가하기</span>'; 
 								tableHtml += ' </li>';
-								break;
-							case "ESC004" :
+								tableHtml += ' <li onclick="fnEvalInfoDelete(\''+shtInfoId+'\')">';
+								tableHtml += '		<img src="${pageContext.request.contextPath}/statics/images/delete.png">';
+								tableHtml += ' 		<span>삭제</span> ';
+								tableHtml += ' </li>';
 								break;
 							default :
 								tableHtml += ' <li onclick="fnEvalInfoDelete(\''+shtInfoId+'\')">';
@@ -315,13 +328,13 @@
 								tableHtml += ' </li>';
 								break;
 							}
-						} else if(shtAllStts == 'ESC000'){ //완료일때
+						} else if(shtAllStts == 'ESC000' || shtAllStts == 'ESC007' || shtAllStts == 'ESC008'){ //완료일때
 							tableHtml += ' <li onclick="fnEvalInfoCopy(\''+shtInfoId+'\')">';
 							tableHtml += '		<img src="${pageContext.request.contextPath}/statics/images/recicle.png">';
 							tableHtml += ' 		<span>재사용</span> ';
 							tableHtml += ' </li>';
 						} else if(shtAllStts == 'ESC006') {
-							tableHtml += ' <li class="tester-list-on-btn" onclick="fnViewEvalList(\''+shtInfoId+'\', \''+shtNm+'\')">';
+							tableHtml += ' <li onclick="fnViewEvalList(\''+shtInfoId+'\', \''+shtNm+'\')">';
 							tableHtml += '		<img src="${pageContext.request.contextPath}/statics/images/test.png">';
 							tableHtml += ' 		<span>평가하기</span>'; 
 							tableHtml += ' </li>';
@@ -445,18 +458,12 @@
 	}
 	
 	
-	function fnEvalInfoUpdate(shtInfoId){
-		window.location.href = "${pageContext.request.contextPath}/evaluation/management/save.do?shtInfoId="+shtInfoId;
-	}
-	
-	
-	function fnDetailView(shtInfoId,shtAllStts){
-		
+	function fnEvalInfoUpdate(shtInfoId,shtAllStts){
 		//평가 완료 / 평가 대기 / 평가 진행중 인경우 상세페이지 아닌 경우 작성중이 화면으로 이동
 		var basicPath = "${pageContext.request.contextPath}/evaluation/management";
 		var url = "";
-		if(shtAllStts == 'ESC000' || shtAllStts == 'ESC005' || shtAllStts == 'ESC006'){
-			url = basicPath + "/detailinfo/"+shtInfoId+"/detail.do?shtAllStts="+shtAllStts;
+		if(shtAllStts == 'ESC000' || shtAllStts == 'ESC005' || shtAllStts == 'ESC006' || shtAllStts == 'ESC007' || shtAllStts == 'ESC008'){
+			url = basicPath + "/save.do?shtInfoId="+shtInfoId;
 		}else{
 			if(shtAllStts == 'ESC001'){ //평가 정보 화면 으로 이동
 				url = basicPath + "/save.do?shtInfoId="+shtInfoId;	
@@ -467,11 +474,40 @@
 			}else if(shtAllStts == 'ESC004'){ //정성적 평가지 작성
 				url = basicPath + "/qlt/"+shtInfoId+"/save.do";
 			}else{
-				alert("해당 평가지 상태를 확인해주세요.");
+				alert("해당 평가지 상태를 확인해 주세요.");
 			}
 		}
 		if(url == ""){
-			alert("해당 평가지 상태를 확인해주세요.");
+			alert("해당 평가지 상태를 확인해 주세요.");
+			return;
+		}
+		window.location.href = url;
+// 		window.location.href = "${pageContext.request.contextPath}/evaluation/management/save.do?shtInfoId="+shtInfoId;
+	}
+	
+	
+	function fnDetailView(shtInfoId,shtAllStts){
+		
+		//평가 완료 / 평가 대기 / 평가 진행중 인경우 상세페이지 아닌 경우 작성중이 화면으로 이동
+		var basicPath = "${pageContext.request.contextPath}/evaluation/management";
+		var url = "";
+		if(shtAllStts == 'ESC000' || shtAllStts == 'ESC005' || shtAllStts == 'ESC006'|| shtAllStts == 'ESC007' || shtAllStts == 'ESC008'){
+			url = basicPath + "/detailinfo/"+shtInfoId+"/detail.do";
+		}else{
+			if(shtAllStts == 'ESC001'){ //평가 정보 화면 으로 이동
+				url = basicPath + "/save.do?shtInfoId="+shtInfoId;	
+			}else if(shtAllStts == 'ESC002'){ //평가 대상 정보 화면으로 이동
+				url = basicPath + "/cmp/"+shtInfoId+"/save.do";				
+			}else if(shtAllStts == 'ESC003'){ //정량적 평가지 작성
+				url = basicPath + "/qnt/"+shtInfoId+"/save.do";
+			}else if(shtAllStts == 'ESC004'){ //정성적 평가지 작성
+				url = basicPath + "/qlt/"+shtInfoId+"/save.do";
+			}else{
+				alert("해당 평가지 상태를 확인해 주세요.");
+			}
+		}
+		if(url == ""){
+			alert("해당 평가지 상태를 확인해 주세요.");
 			return;
 		}
 		window.location.href = url;
@@ -479,22 +515,24 @@
 	}
 	
 	function fnEvalInfoCopy(shtInfoId){
-		$.ajax({
-   			type : "get",
-   			data : {"shtInfoId" : shtInfoId},
-   			url : "${pageContext.request.contextPath}/evaluation/management/"+shtInfoId+"/copy.ajax",
-   			success : function(result) {
-				let resultCode = result.code;
-				let resultMessage = result.message;
-				
-				if(resultCode == 200) {
-					alert(resultMessage);
-					window.location.reload();
-				} else {
-					alert(resultMessage);
-				}
-   			}
-   		});
+		if(confirm('평가지를 재사용 하시겠습니까?')){
+			$.ajax({
+	   			type : "get",
+	   			data : {"shtInfoId" : shtInfoId},
+	   			url : "${pageContext.request.contextPath}/evaluation/management/"+shtInfoId+"/copy.ajax",
+	   			success : function(result) {
+					let resultCode = result.code;
+					let resultMessage = result.message;
+					
+					if(resultCode == 200) {
+						alert(resultMessage);
+						window.location.reload();
+					} else {
+						alert(resultMessage);
+					}
+	   			}
+	   		});
+		}
 	}
 	
 	function fnViewEvalList(shtInfoId, shtNm) {

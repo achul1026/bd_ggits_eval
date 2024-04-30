@@ -4,23 +4,23 @@
 <div class="sign-content">
 	<input type="hidden" id="modalShtInfoId" name="modalShtInfoId" />
   	<div class="sign-head">
-	  평가자 목록 <img src="${pageContext.request.contextPath}/statics/images/close-white.png" class="modal-close">
+	  제안평가위원 목록 <img src="${pageContext.request.contextPath}/statics/images/close-white.png" class="modal-close">
 	</div>
 	<div class="sign-body pd32">
 		<form id="modalSearchForm" method="get" onsubmit="return false;">
-			<input type="hidden" id="pageLocation" name="pageLocation" value="raterList" />
-			<input type="hidden" id="modalPageNo" name="modalPageNo" value="1" />
+			<input type="hidden" id="pageLocation" name="pageLocation" value="raterSave" />
+			<input type="hidden" id="modalPageNo" name="modalPageNo" value="${modalPaging.pageNo}" />
 			<div class="search-plus form wd100">
-				<label>평가자를 검색하세요.</label>
-				<input type="text" id="modalRaterNm" name="modalRaterNm" placeholder="평가자를 검색해주세요."
-					class="border-input" value="${schRtrNm}" onkeyup="fnRaterListEnterKey('','search')"/>
-				<button type="button" id="addTargetBtn" class="plus-btn mini-btn on-btn" onclick="fnRaterList('','search')">검색</button>
+				<label>제안평가위원을 검색하세요.</label>
+				<input type="text" id="modalRaterNm" name="modalRaterNm" placeholder="제안평가위원을 검색해주세요."
+					class="border-input" value="${schRtrNm}" onkeyup="fnRaterListEnterKey('','search', 'save')"/>
+				<button type="button" id="addTargetBtn" class="plus-btn mini-btn on-btn" onclick="fnRaterList('','search', 'save')">검색</button>
 			</div>
 		</form>
 		
 		<div class="tester-list">
 			<div class="search-plus form wd100">
-				<label>평가자 리스트</label>
+				<label>제안평가위원 리스트</label>
 			</div>
 			 <table>
 	              <colgroup>
@@ -46,29 +46,33 @@
 		</div>
 		<form id="raterSaveForm" name="raterSaveForm">
 			<div class="tester-plus-wrap">
-				<div class="search-plus form wd100">
-					<label>평가자 리스트</label>
+				<div class="search-plus form wd100 table-new-registration">
+					<label>제안평가위원 리스트</label>
+					<button type="button" class="mini-sub-btn mini-btn" id="saveRaterBtn">신규 등록</button>
 				</div>
 				<div class="tester-plus-list-wrap">
 					<div>
 						<input type="hidden" id="rtrId" name="rtrId" class="border-input"/>
 						<label>이름</label>
-						<input type="text" id="rtrNm" name="rtrNm" placeholder="작성자명" class="border-input" maxlength="20"/>
+						<input type="text" id="rtrNm" name="rtrNm" placeholder="이름" class="border-input data-validate" maxlength="20" 
+							data-valid-name="이름" data-valid-required/>
 					</div>
 					<div>
 						<label>생년월일</label>
-						<input type="text" id="rtrBrthDt" name="rtrBrthDt" placeholder="생년월일" class="border-input vaild-birthday" maxlength="10"/>
+						<input type="text" id="rtrBrthDt" name="rtrBrthDt" placeholder="생년월일 8자리를 입력해주세요." class="border-input vaild-birthday data-validate" maxlength="10"
+							data-valid-name="생년월일" data-valid-required data-valid-date/>
 					</div>
 					<div>
 						<label>소속</label>
-						<input type="text" id="rtrAgncy" name="rtrAgncy" placeholder="소속" class="border-input" maxlength="50"/>
+						<input type="text" id="rtrAgncy" name="rtrAgncy" placeholder="소속" class="border-input data-validate" maxlength="50"
+							data-valid-name="소속" data-valid-required/>
 					</div>
 					<div>
 						<label>전화번호</label>
-						<input type="text" id="rtrTel" name="rtrTel" placeholder="전화번호" class="border-input vaild-tel" maxlength="13"/>
+						<input type="text" id="rtrTel" name="rtrTel" placeholder="전화번호" class="border-input vaild-tel data-validate" maxlength="13"
+							data-valid-name="전화번호" data-valid-required data-valid-phone/>
 					</div>
 					<div class="tester-btn-wrap">
-						<button type="button" class="mini-sub-btn mini-btn" id="saveRaterBtn">신규 등록</button>
 						<button type="button" class="plus-btn mini-btn on-btn" id="rtrInfoBtn" data-type="save">추가</button>
 					</div>
 				</div>
@@ -106,9 +110,11 @@ $("#saveRaterBtn").on("click",function(){
 $('.modal-close').click(function(){
 	rtrIdList = [];
    $('.tester-list-wrap').hide();
+   $("html, body").removeClass("not_scroll");
 });
 
 $("#rtrInfoBtn").on("click",function(){
+	
 	var type = $(this).attr("data-type");
 	var urlInfo = "${pageContext.request.contextPath}/evaluation/management/rater/save.ajax";
 	var typeInfo = "post";
@@ -118,30 +124,33 @@ $("#rtrInfoBtn").on("click",function(){
 			alert("작성자 정보를 확인해주세요.");
 			return;
 		}
-		//TODO::벨리데이션 추가 작업
 		
 		typeInfo = "get";
 		urlInfo = "${pageContext.request.contextPath}/evaluation/management/rater/"+rtrId+"/update.ajax";
 	}
 	
-	$.ajax({
-		type : typeInfo,
-		url : urlInfo,
-		data : $("#raterSaveForm").serialize(), 
-		success : function(result) {
-			var resultCode = result.code; 
-			var resultMsg = result.message;
-			if(resultCode == '200'){
-				alert(resultMsg)
-				window.location.reload();
-			}else{
-				alert(resultMsg)
+	if($('#raterSaveForm').soValid()){
+		$.ajax({
+			type : typeInfo,
+			url : urlInfo,
+			data : $("#raterSaveForm").serialize(), 
+			success : function(result) {
+				var resultCode = result.code; 
+				var resultMsg = result.message;
+				if(resultCode == '200'){
+					alert(resultMsg)
+					$('#modalRaterNm').val('');
+					fnRaterList('','search', 'save');
+				}else{
+					alert(resultMsg)
+				}
 			}
-		}
-	})
-	
+		})
+	}
 	
 })
+
+
 $("#rtrInfoDeleteBtn").on("click",function(){
 	var rtrId = $("#rtrId").val();
 	if(rtrId == null || rtrId == ''){
@@ -158,6 +167,7 @@ $("#rtrInfoDeleteBtn").on("click",function(){
 		})
 	}
 })
+
 function fnConfirmBtn(){
 	$('.tester-list-wrap').hide();
 }

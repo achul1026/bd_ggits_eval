@@ -6,7 +6,7 @@ public class EvalRtrItemScr {
 	private String rtrSctrScrId; // 평가 점수 ID
 	private String rtrShtId; // 평가자 작성 평가지 ID
 	private String shtItmId; // 평가 항목 ID
-	private int scr; // 평가 점수
+	private float scr; // 평가 점수
 
 	public String getRtrSctrScrId() {
 		return rtrSctrScrId;
@@ -32,11 +32,11 @@ public class EvalRtrItemScr {
 		this.shtItmId = shtItmId;
 	}
 
-	public int getScr() {
+	public float getScr() {
 		return scr;
 	}
 
-	public void setScr(int scr) {
+	public void setScr(float scr) {
 		this.scr = scr;
 	}
 

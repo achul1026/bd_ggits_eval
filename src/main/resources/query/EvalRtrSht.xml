@@ -142,4 +142,52 @@
     	FROM	EVAL_RTR_SHT 
 		WHERE 	BDD_CMP_ID = #{bddCmpId}
 	</delete>
+	
+	<select id="findOneJoinEvalShtByRtrIdAndBddCmpIdAndShtTypeAndShtInfoId" parameterType="String" resultType="EvalRtrSht">
+		SELECT ERS.RTR_SHT_ID, ERS.SHT_SV_DT
+		FROM EVAL_RTR_SHT ERS 
+				INNER JOIN	EVAL_SHT ES ON ES.SHT_ID = ERS.SHT_ID 
+		WHERE 
+				ERS.RTR_ID = #{rtrId}
+		AND ERS.BDD_CMP_ID = #{bddCmpId}
+		AND ES.SHT_TYPE = #{shtType}
+		AND ES.SHT_INFO_ID = #{shtInfoId}
+	</select>
+	 
+	<select id="findAllTotalScr" parameterType="String" resultType="map">
+		SELECT 
+				EBC.BDD_CMP_NM AS bddCmpNm, 
+				ROUND(SUM(ERIS.SCR), 1) AS totalScr
+		FROM EVAL_RTR_SHT ERS 
+				INNER JOIN	EVAL_SHT ES ON ERS.SHT_ID = ES.SHT_ID 
+				INNER JOIN	EVAL_RTR_ITEM_SCR ERIS ON ERS.RTR_SHT_ID = ERIS.RTR_SHT_ID 
+				INNER JOIN EVAL_BDD_CMP EBC ON EBC.BDD_CMP_ID = ERS.BDD_CMP_ID 
+		WHERE 
+				ERS.RTR_ID = #{rtrId}
+		AND 	ES.SHT_INFO_ID = #{shtInfoId}
+		AND 	ES.SHT_TYPE = #{shtType}
+		GROUP BY 
+				ERS.BDD_CMP_ID
+		ORDER BY 
+				EBC.BDD_CMP_NBR 
+	</select>
+	
+	<select id="findOneFileId" parameterType="string" resultType="string">
+	
+		SELECT 
+			MAX(ERS.FILE_ID)
+		FROM 
+			EVAL_RTR_SHT ERS 
+		INNER JOIN 
+			EVAL_SHT ES ON ES.SHT_ID = ERS.SHT_ID 
+		INNER JOIN 
+			EVAL_SHT_INFO ESI ON ESI.SHT_INFO_ID = ES.SHT_INFO_ID 
+		WHERE 
+			ESI.SHT_INFO_ID = #{shtInfoId}
+		AND 
+			ES.SHT_TYPE = 'qlt'
+		AND 
+			ERS.RTR_ID = #{rtrId}
+		ORDER BY ERS.SHT_SV_DT 
+	</select>
 </mapper>

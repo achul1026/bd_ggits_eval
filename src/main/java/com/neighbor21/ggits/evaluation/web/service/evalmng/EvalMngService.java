@@ -150,7 +150,7 @@ public class EvalMngService {
 				}
 			}
 		}catch (Exception e) {
-			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가지 정보 등록에 실패했습니다.");
+			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가지 정보 등록을 실패했습니다.");
 		}
 		
 		if(evalFileInfoDTOList != null && evalFileInfoDTOList.size() > 0) {
@@ -223,7 +223,7 @@ public class EvalMngService {
 				}
 			}
 		}catch (Exception e) {
-			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가지 정보 등록에 실패했습니다.");
+			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가지 정보 등록을 실패했습니다.");
 		}
 		
 		if(evalFileInfoDTOList != null && evalFileInfoDTOList.size() > 0) {
@@ -257,7 +257,7 @@ public class EvalMngService {
 				evalShtInfoMapper.update(evalShtInfo);
 			}
 		}catch (Exception e) {
-			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가대상 정보 등록에 실패했습니다.");
+			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가대상 정보 등록을 실패했습니다.");
 		}
 		
 		return shtInfoId;
@@ -324,7 +324,7 @@ public class EvalMngService {
 				}
 			}
 		}catch (Exception e) {
-			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가대상 정보 수정에 실패했습니다.");
+			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가대상 정보 수정을 실패했습니다.");
 		}
 		
 		return shtInfoId;
@@ -395,7 +395,7 @@ public class EvalMngService {
 	
 	public Map<String,Object> saveEvalShtList(EvalShtInfoDTO evalShtInfoDTO) {
 		Map<String,Object> resultMap = new HashMap<String, Object>();
-		String resultMessage = "평가지 상태 정보 수정 실패했습니다.";
+		String resultMessage = "평가지 상태 정보 수정을 실패했습니다.";
 		String evalSttsCode = "9999";
 		
 		try {
@@ -424,10 +424,10 @@ public class EvalMngService {
 				String fldSctr = evalShtSctrInfo.getFldSctr();
 				//fldSctr null check
 				if(GgitsCommonUtils.isNull(fldSctr)) {
-					throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
+					throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록을 실패했습니다.");
 				}
 				if(fldSctr.length() > 255) {
-					throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
+					throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록을 실패했습니다.");
 				}
 				
 				evalShtSctr.setFldSctr(fldSctr);
@@ -454,10 +454,10 @@ public class EvalMngService {
 					if("qnt".equals(shtType)) {
 						EvalShtQntScr evalShtQntScr = evalShtItemInfo.getEvalShtQntScrInfo();
 						//정량 배점 null check
-						int fldScr = evalShtQntScr.getFldScr(); // 점수
+						float fldScr = evalShtQntScr.getFldScr(); // 점수
 						
 						if(fldScr > 99) {
-							throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
+							throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록을 실패했습니다.");
 						}
 						String qntScrId = GgitsCommonUtils.getUuid();
 						evalShtQntScr.setQntScrId(qntScrId);
@@ -467,17 +467,19 @@ public class EvalMngService {
 					}else {
 						//정성적인 경우
 						for(EvalShtQltScr evalShtQltScr : evalShtItemInfo.getEvalShtQltScrList()) {
-							int scr = evalShtQltScr.getScr(); //점수
+							float scr = evalShtQltScr.getScr(); //점수
 							String scrNm = evalShtQltScr.getScrNm(); //배점명
 							
 							if(scr > 99) {
-								throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
+								throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록을 실패했습니다.");
 							}
-							if(GgitsCommonUtils.isNull(scrNm)) {
-								throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
-							}
-							if(scrNm.length() > 10) {
-								throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
+							if("SCT001".equals(evalShtQltScr.getScrType())) {
+								if(GgitsCommonUtils.isNull(scrNm)) {
+									throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록을 실패했습니다.");
+								}
+								if(scrNm.length() > 10) {
+									throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록을 실패했습니다.");
+								}
 							}
 							String qltScrId = GgitsCommonUtils.getUuid();
 							evalShtQltScr.setQltScrId(qltScrId);
@@ -512,7 +514,7 @@ public class EvalMngService {
 				int evalShtChkCnt = evalShtMapper.countByShtInfoIdAndShtType(evalShtSttsChk);
 				if(evalShtChkCnt == 0) {
 					//평가 정보 상태 변경
-					resultMessage = evalShtName+" 평가지 작성이 저장되었습니다. 작성하지 않은 평가지 선택 후 작성을 진행세요.";
+					resultMessage = evalShtName+" 평가지 작성이 저장되었습니다. 작성하지 않은 평가지 선택 후 작성을 진행하세요.";
 				}else if(evalShtChkCnt == 1) {
 					evalSttsCode = EvalSttsCd.EVAL_WAITING.getCode();
 					resultMessage = "평가지 작성이 저장되었습니다.";
@@ -531,7 +533,7 @@ public class EvalMngService {
 			resultMap.put("resultMessage", resultMessage);
 				
 		}catch (Exception e) {
-			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가지 정보 등록 실패했습니다.");
+			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가지 정보 등록을 실패했습니다.");
 		}
 		
 		return resultMap;
@@ -559,10 +561,10 @@ public class EvalMngService {
 					
 					//fldSctr null check
 					if(GgitsCommonUtils.isNull(fldSctr)) {
-						throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
+						throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록을 실패했습니다.");
 					}
 					if(fldSctr.length() > 255) {
-						throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
+						throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록을 실패했습니다.");
 					}
 					
 					//새로 추가된 평가부문
@@ -603,9 +605,9 @@ public class EvalMngService {
 						if("qnt".equals(shtType)) {
 							EvalShtQntScr evalShtQntScr = evalShtItemInfo.getEvalShtQntScrInfo();
 							//정량 배점 null check
-							int fldScr = evalShtQntScr.getFldScr(); // 점수
+							float fldScr = evalShtQntScr.getFldScr(); // 점수
 							if(fldScr > 99) {
-								throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
+								throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록을 실패했습니다.");
 							}
 							String qntScrId = evalShtQntScr.getQntScrId();
 							evalShtQntScr.setShtItmId(shtItmId);
@@ -626,18 +628,26 @@ public class EvalMngService {
 							//정성적 인경우
 //							EvalShtQltScr evalShtQltScrInfo = evalShtItemInfo.getEvalShtQltScrInfo();
 							for(EvalShtQltScr evalShtQltScrInfo : evalShtItemInfo.getEvalShtQltScrList()) {
-								int scr = evalShtQltScrInfo.getScr(); //점수
+								float scr = evalShtQltScrInfo.getScr(); //점수
 								String scrNm = evalShtQltScrInfo.getScrNm(); //배점명
 								
 								if(scr > 99) {
-									throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
+									throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록을 실패했습니다.");
 								}
-								if(GgitsCommonUtils.isNull(scrNm)) {
-									throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
+								if("SCT001".equals(evalShtQltScrInfo.getScrType())) {
+									if(GgitsCommonUtils.isNull(scrNm)) {
+										throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록을 실패했습니다.");
+									}
+									if(scrNm.length() > 10) {
+										throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록을 실패했습니다.");
+									}
 								}
-								if(scrNm.length() > 10) {
-									throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
-								}
+//								if(GgitsCommonUtils.isNull(scrNm)) {
+//									throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
+//								}
+//								if(scrNm.length() > 10) {
+//									throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"평가지 정보 등록 실패했습니다.");
+//								}
 								
 								String qltScrId = GgitsCommonUtils.getUuid();
 								evalShtQltScrInfo.setQltScrId(qltScrId);
@@ -666,18 +676,29 @@ public class EvalMngService {
 					delEvalShtSctr.setShtSctrId(shtSctrId);
 					evalShtSctrMapper.deleteByShtSctrId(shtSctrId);
 				}
-			} 
+			}
+			
+				
 			//평가 항목 배점 삭제 (부문은 삭제하지 않는 경우)
 			if(evalShtInfoDTO.getDelShtItmIdArray().size() > 0) {
 				deleteEvalItmList(evalShtInfoDTO.getDelShtItmIdArray(), shtType);
 			}
 			EvalShtInfo evalShtInfo = evalShtInfoMapper.findOneByShtInfoId(evalShtInfoDTO.getShtInfoId());
 			
+			Map<String,Object> shtExistCheckMap = evalShtMapper.findOneShtExistCheck(evalShtInfoDTO.getShtInfoId());
+			String shtExistCheck = GgitsCommonUtils.isNull(shtExistCheckMap.get("shtExistCheck")) ? "BOTH_EMPTY" : (String) shtExistCheckMap.get("shtExistCheck");
+			int shtTypeCnt = GgitsCommonUtils.isNull(shtExistCheckMap.get("shtTypeCnt")) ? 0 : Integer.parseInt(String.valueOf(shtExistCheckMap.get("shtTypeCnt")));
+			
+			if(shtTypeCnt == 2 && !EvalSttsCd.EVAL_WAITING.getCode().equals(evalShtInfo.getShtAllStts()) && !"BOTH_EMPTY".equals(shtExistCheck)) {
+				evalShtInfo.setShtAllStts(EvalSttsCd.EVAL_WAITING.getCode());
+				evalShtInfoMapper.update(evalShtInfo);
+			}
+			
 			resultMap.put("evalSttsCode", evalShtInfo.getShtAllStts());
 			resultMap.put("resultMessage", "평가지 정보가 수정되었습니다.");
 			
 		}catch (Exception e) {
-			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가지 정보 수정 실패했습니다.");
+			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가지 정보 수정을 실패했습니다.");
 		}
 		
 		return resultMap;
@@ -802,7 +823,7 @@ public class EvalMngService {
 				} // if 추가 할 평가자가 있다면 실행
 			}
 		}catch (Exception e) {
-			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가자 정보 등록 실패했습니다.");
+			throw new CommonException(ErrorCode.ENTITY_SAVE_FAIL,"평가자 정보 등록을 실패했습니다.");
 		}
 	}
 	
@@ -856,7 +877,7 @@ public class EvalMngService {
 								int qltScrSize = evalShtQltScrList.size(); 
 								if(qltScrSize > 0) {
 									if(itemIdx == 0) {
-										result.setSelectQntScrSize(qltScrSize);
+										result.setSelectQntScrType(evalShtQltScrList.get(0).getScrType());
 										evalShtSctrInfo.setQntScrListSize(qltScrSize);
 									}
 									evalShtItemInfo.setEvalShtQltScrList(evalShtQltScrList);
@@ -939,7 +960,7 @@ public class EvalMngService {
 				}
 			}
 		}catch (Exception e) {
-			 throw new CommonException(ErrorCode.ENTITY_DELETE_FAIL,"평가지 정보 삭제 실패했습니다.");
+			 throw new CommonException(ErrorCode.ENTITY_DELETE_FAIL,"평가지 정보 삭제를 실패했습니다.");
 		}
 	}
 	
@@ -980,7 +1001,7 @@ public class EvalMngService {
 			evalShtInfo.setAccssCd(accssCd);
 			evalShtInfoMapper.update(evalShtInfo);
 		}catch (Exception e) {
-			throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"참여코드가 수정되지 않았습니다.");
+			throw new CommonException(ErrorCode.ENTITY_UPDATE_FAIL,"참여 코드가 수정되지 않았습니다.");
 		}
 
 	}
@@ -1129,11 +1150,60 @@ public class EvalMngService {
 		paramMap.put("shtInfoId", shtInfoId);
 		paramMap.put("shtType", shtType);
 		
-		//header , 평균 , 합계 , 최고 점수 / 최저 점수 목록 setting
-		EvalResultHeaderInfo headerInfo = evalShtMapper.findOneRsultHeaderInfoByShtInfoIdAndShtId(paramMap); 
-		if(headerInfo == null) {
-			throw new CommonException(ErrorCode.ENTITY_DATA_NULL, shtName+ "평가지 정보가 존재하지 않습니다.");
+		EvalResultHeaderInfo headerInfo = null;
+		
+		if (shtType.equals("qlt")) {
+			// 정성적 평가지인 경우
+			//header , 평균 , 합계 , 최고 점수 / 최저 점수 목록 setting
+			headerInfo = evalShtMapper.findOneRsultHeaderInfoByShtInfoIdAndShtId(paramMap); 
+			if(headerInfo == null) {
+				throw new CommonException(ErrorCode.ENTITY_DATA_NULL, shtName+ "평가지 정보가 존재하지 않습니다.");
+			}
+			
+		} 
+		else if(shtType.equals("qnt")) {
+			// 정량적 평가지인 경우
+			headerInfo = evalShtMapper.findOneResultHeaderInfoByShtInfoIdAndShtType(paramMap); 
+			if(headerInfo == null) {
+				throw new CommonException(ErrorCode.ENTITY_DATA_NULL, shtName+ "평가지 정보가 존재하지 않습니다.");
+			}
+		} 
+		else {
+			// 총 평가지인 경우
+			// header. 합계 setting
+			
+			headerInfo = evalShtMapper.findOneRsultHeaderInfoByShtInfoIdAndShtId(paramMap); 
+			if(headerInfo == null) {
+				throw new CommonException(ErrorCode.ENTITY_DATA_NULL, shtName+ "평가지 정보가 존재하지 않습니다.");
+			}
+			
+			// 정성적 평가지 합계 setting
+			paramMap.put("shtType", "qlt");
+			headerInfo.setQltTotalSumList(evalShtMapper.findOneTotalScrByShtType(paramMap));
+			// 정량적 평가지 합계 setting
+			paramMap.put("shtType", "qnt");
+			headerInfo.setQntTotalSumList(evalShtMapper.findOneTotalScrByShtType(paramMap));
+			
+			paramMap.put("shtType", "all");
+			
 		}
+		
+		
+		
+		
+		
+		
+		// 평균 소수점이 0인 경우 소수점 버림
+		if(!GgitsCommonUtils.isNull(headerInfo.getTotalAvgList())) {
+			for(int i = 0; i < headerInfo.getTotalAvgList().size(); i++) {
+				float avgFloat = Float.parseFloat(headerInfo.getTotalAvgList().get(i));
+				float avgFloatRound = (float)Math.floor(avgFloat);
+				if(avgFloat - avgFloatRound == 0.0f) {
+					headerInfo.getTotalAvgList().set(i, String.valueOf((int)avgFloat));
+				}
+			}
+		}
+		
 		evalResultDTO.setEvalResultHeaderInfo(headerInfo);
 		
 		//평가자 정보 조회 

@@ -18,6 +18,8 @@ public class EvalResultDTO {
 		private List<String> totalAvgList;
 		private List<String> maxScrList;
 		private List<String> minScrList;
+		private List<String> qltTotalSumList;
+		private List<String> qntTotalSumList;
 		
 		public List<String> getBddCmpIdList() {
 			return bddCmpIdList;
@@ -65,6 +67,25 @@ public class EvalResultDTO {
 		public void setMinScrList(String minScrList) {
 			if(!GgitsCommonUtils.isNull(minScrList)) {
 				this.minScrList = GgitsCommonUtils.stringArrayToList(minScrList.split(",")); 
+			}
+		}
+		
+		
+		public List<String> getQltTotalSumList() {
+			return qltTotalSumList;
+		}
+		public void setQltTotalSumList(String qltTotalSumList) {
+			if(!GgitsCommonUtils.isNull(qltTotalSumList)) {
+				this.qltTotalSumList = GgitsCommonUtils.stringArrayToList(qltTotalSumList.split(",")); 
+			}
+		}
+		
+		public List<String> getQntTotalSumList() {
+			return qntTotalSumList;
+		}
+		public void setQntTotalSumList(String qntTotalSumList) {
+			if(!GgitsCommonUtils.isNull(qntTotalSumList)) {
+				this.qntTotalSumList = GgitsCommonUtils.stringArrayToList(qntTotalSumList.split(",")); 
 			}
 		}
 		

@@ -7,7 +7,9 @@ public enum EvalSttsCd {
 	EVAL_QNT_FORM_WRITING("ESC003", "정량적 평가지 작성중"),
 	EVAL_QLT_FORM_WRITING("ESC004", "정성적 평가지 작성중"),
 	EVAL_WAITING("ESC005", "평가 대기"),
-	EVAL_PROGRESS("ESC006", "평가 진행중")
+	EVAL_PROGRESS("ESC006", "평가 진행중"),
+	EVAL_SCORE_GRADING("ESC007", "평가 채점 진행중"),
+	EVAL_SOCRE_COMPLETE("ESC008", "평가 채점 완료")
 	;
 	
 	private String code;

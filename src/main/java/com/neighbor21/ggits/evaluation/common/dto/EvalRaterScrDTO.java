@@ -6,7 +6,7 @@ import com.neighbor21.ggits.evaluation.common.entity.EvalRtrItemScr;
 
 public class EvalRaterScrDTO {
 	
-	private int totalScr; // 정량 배점 사이즈
+	private float totalScr; // 정량 배점 사이즈
 	private int totalMaxScr; // 평가지 순서
 	private String saveType;
 	private List<EvalRtrItemScr> evalRtrItemScrList;
@@ -15,12 +15,12 @@ public class EvalRaterScrDTO {
 		public static class ConfirmScrInfo {
 			
 			private String fldSctr; // 평가 부문
-			private int scr; // 평가자 배점의 부문 총계
+			private float scr; // 평가자 배점의 부문 총계
 			private int maxScr;  // 부문 최대 배점
-			public int getScr() {
+			public float getScr() {
 				return scr;
 			}
-			public void setScr(int scr) {
+			public void setScr(float scr) {
 				this.scr = scr;
 			}
 			public int getMaxScr() {
@@ -55,11 +55,11 @@ public class EvalRaterScrDTO {
 		this.confirmScrInfoList = confirmScrInfoList;
 	}
 
-	public int getTotalScr() {
+	public float getTotalScr() {
 		return totalScr;
 	}
 
-	public void setTotalScr(int totalScr) {
+	public void setTotalScr(float totalScr) {
 		this.totalScr = totalScr;
 	}
 

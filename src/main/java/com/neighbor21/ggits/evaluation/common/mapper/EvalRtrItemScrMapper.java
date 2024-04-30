@@ -2,6 +2,7 @@ package com.neighbor21.ggits.evaluation.common.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
 import org.egovframe.rte.psl.dataaccess.mapper.Mapper;
 
 import com.neighbor21.ggits.evaluation.common.entity.EvalRtrItemScr;
@@ -17,6 +18,11 @@ public interface EvalRtrItemScrMapper {
 	 * @param rtrShtId
 	 */
 	public List<EvalRtrItemScr> findAllRtrItemScrJoinRtrShtByRtrShtId(String rtrShtId);
+	
+	public List<EvalRtrItemScr> findAllRtrItemScrJoinRtrShtAndEvalShtByRtrIdAndShtInfoId(@Param("shtInfoId") String shtInfoId
+																			, @Param("rtrId") String rtrId
+																			, @Param("shtType") String shtType);
+	
 	
 	/**
 	 * @Method Name : update
@@ -35,5 +41,16 @@ public interface EvalRtrItemScrMapper {
 	 * @param evalRtrItemScr
 	 */
 	public void update(EvalRtrItemScr evalRtrItemScr);
+	
+	/**
+	 * @Method Name : findTotalScrByRtrShtId
+	 * @작성일 : 2023. 12. 18.
+	 * @작성자 : IK.MOON
+	 * @Method 설명 : 평가 완료 한 최종 평가 점수 조회
+	 * @param rtrShtId
+	 */
+	public float findTotalScrByRtrShtId(String rtrShtId);
+	
+	
 	
 }

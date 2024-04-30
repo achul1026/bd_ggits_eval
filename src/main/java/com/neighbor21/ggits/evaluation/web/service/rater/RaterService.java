@@ -1,9 +1,7 @@
 package com.neighbor21.ggits.evaluation.web.service.rater;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,7 +83,7 @@ public class RaterService {
 	  * @return
 	  */
 	public EvalRtr findOneEvalShtInfoByBirtDt(EvalRtr evalRtrCheck) {
-		EvalRtr evalRtr = evalRtrMapper.findOneRtrByBirtDt(evalRtrCheck);
+		EvalRtr evalRtr = evalRtrMapper.findOneRtrByBirtDtAndShtInfoId(evalRtrCheck);
 		return evalRtr;
 	}
 	
@@ -101,19 +99,6 @@ public class RaterService {
 		EvalShtInfo evalShtInfo = evalShtInfoMapper.findOneShtInfoByShtInfoId(shtInfoId);
 		return evalShtInfo;
 	}
-//	
-//	/**
-//	 * @Method Name : findAllFileByShtInfoId
-//	 * @작성일 : 2023. 10. 23.
-//	 * @작성자 : IK.MOON
-//	 * @Method 설명 : 평가자 생년월일 일치 확인
-//	 * @param accssCd
-//	 * @return
-//	 */
-//	public List<EvalFile> findAllFileByShtInfoId(String shtInfoId) {
-//		List<EvalFile> evalFiles = evalFileMapper.findAllByShtInfoId(shtInfoId);
-//		return evalFiles;
-//	}
 	
 	/**
 	 * @Method Name : findAllBddCmpByShtInfoIdOrderByCmpNbr
@@ -129,15 +114,18 @@ public class RaterService {
 		List<EvalBddCmp> evalBddCmpList = evalBddCmpMapper.findAllBddCmpByShtInfoIdOrderByCmpNbr(evalShtInfo); 
 		for(EvalBddCmp evalBddCmpOut : evalBddCmpList) {
 			EvalBddCmpEvalListDto evalBddCmpEvalListDto = new EvalBddCmpEvalListDto();
-			try {
-				evalBddCmpEvalListDto.setBddCmpId(evalBddCmpOut.getBddCmpId());
-				evalBddCmpEvalListDto.setBddCmpNm(evalBddCmpOut.getBddCmpNm());
-				evalBddCmpEvalListDto.setBddCmpNbr(evalBddCmpOut.getBddCmpNbr());
-				List<EvalRtrSht> evalRtrShtList = evalRtrShtMapper.findAllRtrShtByRtrIdAndBddCmpId(rtrId, evalBddCmpOut.getBddCmpId(), shtType);
-				evalBddCmpEvalListDto.setEvalRtrSht(evalRtrShtList);
-			} catch (Exception e) {
-				System.out.println(e);
+
+			evalBddCmpEvalListDto.setBddCmpId(evalBddCmpOut.getBddCmpId());
+			evalBddCmpEvalListDto.setBddCmpNm(evalBddCmpOut.getBddCmpNm());
+			evalBddCmpEvalListDto.setBddCmpNbr(evalBddCmpOut.getBddCmpNbr());
+			List<EvalRtrSht> evalRtrShtList = evalRtrShtMapper.findAllRtrShtByRtrIdAndBddCmpId(rtrId, evalBddCmpOut.getBddCmpId(), shtType);
+			
+			EvalRtrSht evalRtrSht = evalRtrShtList.get(0);
+
+			if(!GgitsCommonUtils.isNull(evalRtrSht.getShtSvDt())) {
+				evalRtrShtList.get(0).setTotalScr(evalRtrItemScrMapper.findTotalScrByRtrShtId(evalRtrSht.getRtrShtId()));
 			}
+			evalBddCmpEvalListDto.setEvalRtrSht(evalRtrShtList);
 			
 			result.add(evalBddCmpEvalListDto);
 		}
@@ -145,7 +133,7 @@ public class RaterService {
 	}
 	
 	/**
-	 * @Method Name : findAllBddCmpByShtInfoIdOrderByCmpNbr
+	 * @Method Name : countAllEvalShtInfoList
 	 * @작성일 : 2023. 10. 23.
 	 * @작성자 : IK.MOON
 	 * @Method 설명 : 평가할 기업 목록 개수 조회
@@ -158,7 +146,7 @@ public class RaterService {
 	}
 	
 	/**
-	 * @Method Name : findAllBddCmpByShtInfoIdOrderByCmpNbr
+	 * @Method Name : findAllRtrItemScrJoinRtrShtByRtrShtId
 	 * @작성일 : 2023. 10. 23.
 	 * @작성자 : IK.MOON
 	 * @Method 설명 : 평가할 기업 목록 개수 조회
@@ -170,8 +158,13 @@ public class RaterService {
 		return evalRtrItemScrMapper.findAllRtrItemScrJoinRtrShtByRtrShtId(rtrShtId);
 	}
 	
+	public List<EvalRtrItemScr> findAllRtrItemScrJoinRtrShtAndEvalShtByRtrIdAndShtInfoId(String shtInfoId, String rtrId, String shtType) {
+		
+		return evalRtrItemScrMapper.findAllRtrItemScrJoinRtrShtAndEvalShtByRtrIdAndShtInfoId(shtInfoId, rtrId, shtType);
+	}
+	
 	/**
-	 * @Method Name : findAllBddCmpByShtInfoIdOrderByCmpNbr
+	 * @Method Name : saveRtrScr
 	 * @작성일 : 2023. 10. 23.
 	 * @작성자 : IK.MOON
 	 * @Method 설명 : 평가할 기업 목록 개수 조회
@@ -196,7 +189,7 @@ public class RaterService {
 	}
 	
 	/**
-	 * @Method Name : findAllBddCmpByShtInfoIdOrderByCmpNbr
+	 * @Method Name : updateRtrScr
 	 * @작성일 : 2023. 10. 23.
 	 * @작성자 : IK.MOON
 	 * @Method 설명 : 평가할 기업 목록 개수 조회

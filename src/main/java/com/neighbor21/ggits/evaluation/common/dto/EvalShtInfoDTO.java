@@ -15,7 +15,7 @@ public class EvalShtInfoDTO {
 	private List<String> delShtSctrIdArray;
 	private List<String> delShtItmIdArray;
 	
-	private int selectQntScrSize = 3;
+	private String selectQntScrType = "SCT001"; // 기본값 5개 
 	
 	public static class EvalShtSctrInfo {
 
@@ -137,12 +137,12 @@ public class EvalShtInfoDTO {
 		this.saveType = saveType;
 	}
 	
-	public int getSelectQntScrSize() {
-		return selectQntScrSize;
+	public String getSelectQntScrType() {
+		return selectQntScrType;
 	}
 
-	public void setSelectQntScrSize(int selectQntScrSize) {
-		this.selectQntScrSize = selectQntScrSize;
+	public void setSelectQntScrType(String selectQntScrType) {
+		this.selectQntScrType = selectQntScrType;
 	}
 
 	public String getShtId() {

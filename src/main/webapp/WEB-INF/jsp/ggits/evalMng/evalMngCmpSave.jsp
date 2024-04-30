@@ -3,25 +3,25 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %> 
 <div class="content">
 	<div class="login_wrap">
-			<button type="button" onclick="logout()">
+			<button type="button" onclick="logout('admin')">
 				<img src="${pageContext.request.contextPath}/statics/images/logout.png">
 					로그아웃
 			</button>
 		</div>
 	<div class="content-head">
 		<img src="${pageContext.request.contextPath}/statics/images/logo.png" class="logo">
-		<h1>평가대상 등록</h1>
+		<h1>제안평가 대상 등록</h1>
 	</div>
 	 <div class="progressbar-wrapper">
 	      <ul class="progressbar">
 	          <li class="progress-complete">
-	          	<p>평가정보 입력</p>
+	            <p>제안평가<br> 정보 입력</p>
 	          </li>
 	          <li class="active">
-	          	<p>평가대상 등록</p>
+	          	<p>제안평가<br> 대상 등록</p>
 	          </li>
 	          <li class="">
-	          	<p>평가유형 선택</p>
+	          	<p>평가 유형 선택</p>
 	          </li>
 	          <li class="">
 	          	<p>평가지 작성</p>
@@ -30,14 +30,14 @@
 	          	<p>평가지 상세정보</p>
 	          </li>
 	           <li>
-	          	<p>평가결과 확인</p>
+	          	<p>평가 결과 확인</p>
 	          </li>
 	      </ul>
     </div>
 	<div class="">
 	
 		<div class="form wd100">
-			<label>평가대상(평가업체)</label>
+			<label>제안평가 대상(평가 업체)</label>
 			<div class="search-plus ">
 				<input type="text" id="companyNm" placeholder="평가대상을 입력해주세요." class="plus-input border-input"/>
 				<button type="button" id="addTargetBtn" class="plus-btn mini-btn on-btn">추가</button>
@@ -48,7 +48,7 @@
 		<form id="cmpSaveForm" name="cmpSaveForm">
 			<input type="hidden" id="shtInfoId" value="${shtInfoId}">
 			<div class="search-list-title form wd100">
-				<label>평가대상 리스트</label>
+				<label>제안평가 대상 리스트 <span class="drag-color">(드래그로 순서 변경 가능)</span></label>
 			</div>
 			<div class="search-list-sub-wrap test-table" id="cmpSortable" >
 				<c:if test="${fn:length(evalBddCmpList) ne 0}">
@@ -132,7 +132,7 @@
 			$("#cmpSortable").append(html);
 			$("#companyNm").val("");
 		} else {
-			alert("평가대상을 입력해주세요.");
+			alert("평가대상을 입력해 주세요.");
 			return false;
 		}
 		

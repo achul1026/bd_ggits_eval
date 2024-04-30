@@ -82,7 +82,7 @@
 				'ESC006'	
 			</if>
 			<if test="schSchStts == 'complete' ">
-				'ESC000'	
+				'ESC000', 'ESC007', 'ESC008'
 			</if>
 			)
 		</if>
@@ -112,7 +112,7 @@
 				'ESC006'	
 			</if>
 			<if test="schSchStts == 'complete' ">
-				'ESC000'	
+				'ESC000', 'ESC007', 'ESC008'	
 			</if>
 			)
 		</if>
@@ -155,7 +155,10 @@
 		FROM
 			(
 			SELECT
-				CASE WHEN SHT_ALL_STTS = 'ESC000' THEN COUNT(SHT_ALL_STTS) ELSE 0 END AS COMPLETE_CNT,
+				CASE WHEN SHT_ALL_STTS = 'ESC000'
+							OR SHT_ALL_STTS = 'ESC007'
+							OR SHT_ALL_STTS = 'ESC008'
+					THEN COUNT(SHT_ALL_STTS) ELSE 0 END AS COMPLETE_CNT,
 				CASE WHEN 	SHT_ALL_STTS 	= 'ESC001' 
 							OR SHT_ALL_STTS = 'ESC002' 
 							OR SHT_ALL_STTS = 'ESC003' 

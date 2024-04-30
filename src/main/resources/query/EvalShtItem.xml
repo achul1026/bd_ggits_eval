@@ -47,4 +47,23 @@
 	<delete id="deleteByShtItmId" parameterType="String">
 		DELETE FROM EVAL_SHT_ITEM WHERE SHT_ITM_ID = #{shtItmId}
 	</delete>
+	
+	<select id="findTotalMaxScrByShtInfoIdAndShtType" parameterType="String" resultType="int">
+		SELECT SUM(maxScrs.maxScr) AS totalMaxScr
+		FROM
+			(SELECT ESI.SHT_ITM_ID, MAX(ESQS.SCR) AS maxScr
+			FROM EVAL_SHT_QLT_SCR ESQS 
+				INNER JOIN 
+					EVAL_SHT_ITEM ESI ON ESI.SHT_ITM_ID = ESQS.SHT_ITM_ID
+				INNER JOIN 
+					EVAL_SHT_SCTR ESS ON ESS.SHT_SCTR_ID = ESI.SHT_SCTR_ID 
+				INNER JOIN EVAL_SHT 
+					ES ON ES.SHT_ID = ESS.SHT_ID 
+			WHERE 
+					ES.SHT_INFO_ID = #{shtInfoId}
+			AND 
+					ES.SHT_TYPE = #{shtType}
+			GROUP BY 
+					ESI.SHT_ITM_ID) AS maxScrs
+	</select>
 </mapper>

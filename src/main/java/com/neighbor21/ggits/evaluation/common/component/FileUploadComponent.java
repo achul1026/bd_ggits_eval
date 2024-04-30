@@ -358,9 +358,14 @@ public class FileUploadComponent {
 				//정량적 평가지 인경우 배점 정보 HEADER 체크
 				if("qlt".equals(shtType)) {
 					//평가부문명 / 항목 / 요소 / 등급,배점 3점 / 5점 
-					if(headerSize != 9 && headerSize != 13) {
-						throw new CommonException(ErrorCode.DATA_MATCH_FAIL,"정량적 CSV 파일 입력 정보를 확인해주세요.");
+//					if(headerSize != 9 && headerSize != 13) {
+//						throw new CommonException(ErrorCode.DATA_MATCH_FAIL,"정량적 CSV 파일 입력 정보를 확인해주세요.");
+//					}
+					//평가부문 / 항목 /요소 / 배점
+					if(headerSize != 4) {
+						throw new CommonException(ErrorCode.DATA_MATCH_FAIL,"정성적 CSV 파일 입력 정보를 확인해주세요.");
 					}
+					
 				}else {
 					//평가부문 / 항목 /요소 / 배점
 					if(headerSize != 4) {
@@ -393,6 +398,8 @@ public class FileUploadComponent {
 				List<EvalShtQltScr> evalShtQltScrList = new ArrayList<EvalShtQltScr>();
 				//정성 평가지인 경우
 				EvalShtQltScr evalShtQltScr = new EvalShtQltScr(); 
+				// 자율 배점 타입
+				evalShtQltScr.setScrType("SCT002");
 				
 				//정량 평가지 인경우 
 				EvalShtQntScr evalShtQntScr = new EvalShtQntScr();
@@ -444,38 +451,51 @@ public class FileUploadComponent {
 					
 					//평가 항목
 					//3~13 번째 배점정보 저장
-					if("qnt".equals(shtType)) {
-						if(csvInfoIdx == 3) {
-							if(GgitsCommonUtils.isNull(csvFileInfo)) {
-								//배점 없음
-								throw new CommonException(ErrorCode.DATA_MATCH_FAIL,"CSV 파일 입력하신 정보를 확인해주세요.");
-							}
-							int fldScr = Integer.parseInt(csvFileInfo);
-							evalShtQntScr.setFldScr(fldScr);
+					if(csvInfoIdx == 3) {
+						if(GgitsCommonUtils.isNull(csvFileInfo)) {
+							//배점 없음
+							throw new CommonException(ErrorCode.DATA_MATCH_FAIL,"CSV 파일 입력하신 정보를 확인해주세요.");
 						}
-					}else {
-						//정성
-						if(csvInfoIdx > 2 && csvInfoIdx < 13) {
-							if(GgitsCommonUtils.isNull(csvFileInfo)) {
-								//배점 없음
-								throw new CommonException(ErrorCode.DATA_MATCH_FAIL,"배점 정보를 확인해주세요.");
-							}
-							//3,5,7,9,11 배점 등급
-							if(csvInfoIdx%2 == 1) {
-								evalShtQltScr.setScrNm(csvFileInfo);
-							}else {
-								//4,6,8,10,12 배점
-								int scr = Integer.parseInt(csvFileInfo);
-								evalShtQltScr.setScr(scr);
-								evalShtQltScr.setScrOrdr(qntScrOrdr);
-								//배점인 경우 List Add
-								evalShtQltScrList.add(evalShtQltScr);
-								qntScrOrdr++;
-								//정량적 배점 평가 초기화
-								evalShtQntScr = new EvalShtQntScr();
-							}
+						int fldScr = Integer.parseInt(csvFileInfo);
+						if("qnt".equals(shtType)) {
+							evalShtQntScr.setFldScr(fldScr);
+						} else {
+							evalShtQltScr.setScr(fldScr);
+							evalShtQltScrList.add(evalShtQltScr);
 						}
 					}
+//					if("qnt".equals(shtType)) {
+//						if(csvInfoIdx == 3) {
+//							if(GgitsCommonUtils.isNull(csvFileInfo)) {
+//								//배점 없음
+//								throw new CommonException(ErrorCode.DATA_MATCH_FAIL,"CSV 파일 입력하신 정보를 확인해주세요.");
+//							}
+//							int fldScr = Integer.parseInt(csvFileInfo);
+//							evalShtQntScr.setFldScr(fldScr);
+//						}
+//					}else {
+//						//정성
+//						if(csvInfoIdx > 2 && csvInfoIdx < 13) {
+//							if(GgitsCommonUtils.isNull(csvFileInfo)) {
+//								//배점 없음
+//								throw new CommonException(ErrorCode.DATA_MATCH_FAIL,"배점 정보를 확인해주세요.");
+//							}
+//							//3,5,7,9,11 배점 등급
+//							if(csvInfoIdx%2 == 1) {
+//								evalShtQltScr.setScrNm(csvFileInfo);
+//							}else {
+//								//4,6,8,10,12 배점
+//								int scr = Integer.parseInt(csvFileInfo);
+//								evalShtQltScr.setScr(scr);
+//								evalShtQltScr.setScrOrdr(qntScrOrdr);
+//								//배점인 경우 List Add
+//								evalShtQltScrList.add(evalShtQltScr);
+//								qntScrOrdr++;
+//								//정량적 배점 평가 초기화
+//								evalShtQntScr = new EvalShtQntScr();
+//							}
+//						}
+//					}
 				
 					
 					//마지막 idx 에서 DTO Save

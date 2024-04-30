@@ -4,6 +4,9 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <div class="content">
 	<div class="login_wrap">
+		<button type="button" id="cancelBtn" class="back-btn">
+			<img src="${pageContext.request.contextPath}/statics/images/back.png">
+		</button>
 		<button type="button" onclick="logout('admin')">
 			<img src="${pageContext.request.contextPath}/statics/images/logout.png">
 				로그아웃
@@ -11,28 +14,8 @@
 	</div>
 	<div class="content-head">
 	     <img src="${pageContext.request.contextPath}/statics/images/logo.png" class="logo">
-			<h1>평가기업 목록 입니다.</h1>
+			<h1>제안평가 대상 기업 목록</h1>
 	</div>
-	
-<!-- 	<div class="progressbar-wrapper progressbar-wrapper-tablet"> -->
-<!-- 	      <ul class="progressbar"> -->
-<!-- 	          <li class="progress-complete"> -->
-<!-- 	          	<p>평가자 정보 입력</p> -->
-<!-- 	          </li> -->
-<!-- 	          <li class="progress-complete"> -->
-<!-- 	          	<p>평가지 정보 확인</p> -->
-<!-- 	          </li> -->
-<!-- 	          <li class="active"> -->
-<!-- 	          	<p>평가 목록</p> -->
-<!-- 	          </li> -->
-<!-- 	          <li> -->
-<!-- 	          	<p>평가 화면</p> -->
-<!-- 	          </li> -->
-<!-- 	          <li> -->
-<!-- 	          	<p>평가점수 확인</p> -->
-<!-- 	          </li> -->
-<!-- 	      </ul> -->
-<!-- 	</div> -->
 		
 	<div class="status status-left">
 		<form id="searchForm" method="get">
@@ -51,8 +34,6 @@
 		
 	<div class="list-wrap border-none">
 	  	<c:forEach var="evalBddCmp" items="${evalBddCmpList}" varStatus="loop">
-			
-<%-- 			<div class="list" onclick="fnEvalSheetView('qlt', '${evalBddCmp.evalRtrSht[0].rtrShtId}', '${evalBddCmp.bddCmpNm}')"> --%>
 			<div class="list" 
 				<c:if test="${evalBddCmp.evalRtrSht[0].shtStts eq 'ERSSC004'}">
 					onclick="fnEvalSheetView('${shtInfoId}', '${evalBddCmp.bddCmpNm}', '${evalBddCmp.bddCmpId }')"
@@ -66,10 +47,10 @@
 					<span>
 						<c:choose>
 							<c:when test="${evalBddCmp.evalRtrSht[0].shtStts eq 'ERSSC004'}">
-								[평가중]										
+								평가중									
 							</c:when>
 							<c:otherwise>
-								[완료]
+								완료
 							</c:otherwise>
 						</c:choose>
 					</span>
@@ -81,10 +62,16 @@
 						</div>
 						<div class="list-join-code">
 							<c:if test="${evalBddCmp.evalRtrSht[0].shtSvDt ne null}">
-								<span>
-									<fmt:formatDate var="shtSvDt" pattern="yyyy년 MM월 dd일" value="${evalBddCmp.evalRtrSht[0].shtSvDt}" />
-									평가등록 : ${shtSvDt}<br>
-								</span>	
+								<fmt:formatDate var="shtSvDt" pattern="yyyy년 MM월 dd일" value="${evalBddCmp.evalRtrSht[0].shtSvDt}" />
+								
+								<fmt:formatNumber var="totalScr" value="${evalBddCmp.evalRtrSht[0].totalScr}" pattern=".00"/>
+								<fmt:parseNumber var="intScr" value="${totalScr}" integerOnly="true"/>
+								<c:if test="${totalScr - intScr eq 0}">
+									<c:set var="totalScr" value="${intScr}"/>
+								</c:if>			
+													
+								<div class="complete-score">평가점수: ${totalScr} / ${qntMaxScr}</div>
+								<div>평가등록 : ${shtSvDt}</div>
 							</c:if>
 						</div>
 					</div>
@@ -93,9 +80,7 @@
 		</c:forEach>
 	</div>
 	<%@ include file="/WEB-INF/jsp/ggits/utils/paging.jsp"%>
-	<div class="footer-wrap">
-		<button type="button" id="cancelBtn" class="mini-btn mini-sub-btn prev">이전</button>
-	</div>
+	
 </div>
 <div id="typeSelectModal"></div>
 

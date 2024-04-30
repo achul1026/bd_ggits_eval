@@ -5,7 +5,7 @@ public class EvalShtQntScr {
 
 	private String qntScrId; // 정성적 평가지 배점 ID
 	private String shtItmId; // 평가 항목 ID
-	private int fldScr; // 평가지 필드 점수
+	private float fldScr; // 평가지 필드 점수
 
 	
 	public String getQntScrId() {
@@ -24,11 +24,11 @@ public class EvalShtQntScr {
 		this.shtItmId = shtItmId;
 	}
 
-	public int getFldScr() {
+	public float getFldScr() {
 		return fldScr;
 	}
 
-	public void setFldScr(int fldScr) {
+	public void setFldScr(float fldScr) {
 		this.fldScr = fldScr;
 	}
 

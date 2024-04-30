@@ -15,16 +15,18 @@
 		ORDER BY er.CRT_DT DESC
 	</select>
 
-	<select id="findOneRtrByBirtDt" parameterType="evalRtr" resultType="evalRtr">
+	<select id="findOneRtrByBirtDtAndShtInfoId" parameterType="evalRtr" resultType="evalRtr">
 		SELECT 
 				er.RTR_ID, 
 				er.RTR_NM, 
 				er.RTR_AGNCY,
 				er.RTR_TEL  
-		FROM EVAL_RTR er 
+		FROM EVAL_RTR er
+		LEFT JOIN EVAL_RTR_LIST ERL ON ERL.RTR_ID = er.RTR_ID 
 		WHERE 
 			er.RTR_BRTH_DT = #{rtrBrthDt}
-		AND er.RTR_ID = #{rtrId}
+		AND er.RTR_NM = #{rtrNm}
+		AND ERL.SHT_INFO_ID = #{shtInfoId}
 	</select>
 	
 	<select id="findAll" parameterType="evalRtr" resultType="evalRtr">
@@ -125,5 +127,12 @@
 		AND		RTR_BRTH_DT	=	#{rtrBrthDt}
 		AND		RTR_AGNCY	=	#{rtrAgncy} 
 		AND		RTR_TEL		=	#{rtrTel}
+	</select>
+	
+	<select id="findOneRtrAgncyByRtrId" parameterType="string" resultType="string">
+		SELECT 
+				RTR_AGNCY
+		FROM	EVAL_RTR
+		WHERE 	RTR_ID		=	#{rtrId} 
 	</select>
 </mapper>

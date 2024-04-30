@@ -38,7 +38,7 @@ public interface EvalRtrMapper {
 	 * @param rtrBrthDt
 	 * @return
 	 */
-	public EvalRtr findOneRtrByBirtDt(EvalRtr rtrBrthDt);
+	public EvalRtr findOneRtrByBirtDtAndShtInfoId(EvalRtr evalRtr);
 	
 	/**
 	  * @Method Name : findAll
@@ -88,4 +88,5 @@ public interface EvalRtrMapper {
 	  */
 	public int findOneEvalRtrDuplChk(EvalRtr evalRtr);
 	
+	public String findOneRtrAgncyByRtrId(String rtrId);
 }

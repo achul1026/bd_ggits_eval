@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!-- 평가 점수 확인 화면 -->
+<div class="wrap">
 <div class="content score-content">
 	<div class="login_wrap">
 		<button type="button" onclick="logout('rater')">
@@ -16,26 +17,26 @@
 	<div class="progressbar-wrapper progressbar-wrapper-tablet">
 	      <ul class="progressbar">
 	          <li class="progress-complete">
-	          	<p>평가자 정보 입력</p>
+	          	<p>제안평가<br> 정보 입력</p>
 	          </li>
 	          <li class="progress-complete">
 	          	<p>평가지 정보 확인</p>
 	          </li>
 	          <li class="progress-complete">
-	          	<p>평가 목록</p>
+	          	<p>제안평가<br> 목록</p>
 	          </li>
 	          <li class="progress-complete">
-	          	<p>평가 화면</p>
+	          	<p>제안평가<br> 화면</p>
 	          </li>
 	          <li class="active">
-	          	<p>평가점수 확인</p>
+	          	<p>제안평가<br> 점수 확인</p>
 	          </li>
 	      </ul>
 	</div>
 	
 	<div class="test-info ">
 		<dl>
-			<dt>- 평가대상 (평가업체) : </dt>
+			<dt>- 제안평가위원회 대상 (제안평가위원회 업체) : </dt>
 			<dd>${bddCmpNbr}번</dd>
 		</dl>
 	</div>
@@ -50,7 +51,7 @@
 		
 		<div class="sub-score">
 			<div class="score-head">
-				<h3>평가 부문별</h3>
+				<h3>제안평가위원회 부문별</h3>
 			</div>
 			
 			<div class="score-body">
@@ -77,7 +78,7 @@
 		</c:choose>
 	</div>
 </div>
-
+</div>
 <script type="text/javascript">
 
 	// 내용에 따라, textarea height 수정

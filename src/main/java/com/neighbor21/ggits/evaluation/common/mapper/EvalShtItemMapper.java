@@ -2,6 +2,7 @@ package com.neighbor21.ggits.evaluation.common.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
 import org.egovframe.rte.psl.dataaccess.mapper.Mapper;
 
 import com.neighbor21.ggits.evaluation.common.entity.EvalShtItem;
@@ -46,4 +47,15 @@ public interface EvalShtItemMapper {
 	  * @param shtItmId
 	  */
 	public void deleteByShtItmId(String shtItmId);
+	
+	/**
+	 * @Method Name : findTotalMaxScrByShtInfoIdAndShtType
+	 * @작성일 : 2024. 01. 05.
+	 * @작성자 : IK.MOON
+	 * @Method 설명 : 평가지 최대배점 총합 조회
+	 * @param shtItmId
+	 */
+	public int findTotalMaxScrByShtInfoIdAndShtType(@Param("shtInfoId") String shtInfoId,
+													@Param("shtType") String shtType);
+	
 }

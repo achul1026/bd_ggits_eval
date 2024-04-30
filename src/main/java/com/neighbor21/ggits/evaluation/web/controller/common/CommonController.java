@@ -98,39 +98,7 @@ public class CommonController {
     	
 		return "modal/common/modalRaterList";
 	}
-	/**
-	 * @Method Name : modalRaterMngList
-	 * @작성일 : 2023. 9. 5.
-	 * @작성자 : IK.MOON
-	 * @Method 설명 : 평가자 목록 조회 
-	 * @return
-	 */
-	@GetMapping("/modal/raterMng/list.do")
-	public String modalRaterMngList(Model model, EvalRtr evalRtr) {
-		
-		//전체목록 호출
-		int pageSize = 5;
-		int paramPageNo = evalRtr.getPageNo();
-		int pageNo = (evalRtr.getPageNo() - 1) * pageSize;
-		evalRtr.setPageNo(pageNo);
-		
-		List<EvalRtr> evalRtrList = evalRtrMapper.findAll(evalRtr); 
-		int evalRtrTotalCnt = evalRtrMapper.countAll(evalRtr);
-		
-		Paging modalPaging = new Paging();
-		modalPaging.setPageSize(pageSize);
-		modalPaging.setPageNo(paramPageNo);
-		modalPaging.setTotalCount(evalRtrTotalCnt);
-		
-		model.addAttribute("schRtrNm", evalRtr.getSchRtrNm());
-		model.addAttribute("evalRtrList", evalRtrList);
-		model.addAttribute("modalPaging", modalPaging);
-		model.addAttribute("rtrIdList", evalRtr.getRtrIdList());
-		
-		//모달 하단 등록된 평가자 목록 재호출
-		
-		return "modal/common/modalRaterMng";
-	}
+
 	/**
 	 * @Method Name : modalSaveRaterList
 	 * @작성일 : 2023. 9. 5.
@@ -388,17 +356,17 @@ public class CommonController {
 	}
 	
 	
-	/**
-	 * @Method Name : modalCmpSave
-	 * @작성일 : 2023. 10. 25.
-	 * @작성자 : IK.MOON
-	 * @Method 설명 : 평가 기업 입력 모달
-	 * @param shtInfoId
-	 * @return
-	 */
-	@GetMapping("/modal/cmp/save.do")
-	public String modalCmpSave(){
-		
-		return "modal/common/modalCmpSave";
-	}
+//	/**
+//	 * @Method Name : modalCmpSave
+//	 * @작성일 : 2023. 10. 25.
+//	 * @작성자 : IK.MOON
+//	 * @Method 설명 : 평가 기업 입력 모달
+//	 * @param shtInfoId
+//	 * @return
+//	 */
+//	@GetMapping("/modal/cmp/save.do")
+//	public String modalCmpSave(){
+//		
+//		return "modal/common/modalCmpSave";
+//	}
 }

@@ -1,6 +1,5 @@
 package com.neighbor21.ggits.evaluation.web.controller.rater;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,6 @@ import com.neighbor21.ggits.evaluation.common.component.validate.ValidateChecker
 import com.neighbor21.ggits.evaluation.common.component.validate.ValidateResult;
 import com.neighbor21.ggits.evaluation.common.dto.EvalBddCmpEvalListDto;
 import com.neighbor21.ggits.evaluation.common.dto.EvalRaterScrDTO;
-import com.neighbor21.ggits.evaluation.common.dto.EvalRaterScrDTO.ConfirmScrInfo;
 import com.neighbor21.ggits.evaluation.common.dto.EvalShtInfoDTO;
 import com.neighbor21.ggits.evaluation.common.dto.EvalShtInfoDTO.EvalShtSctrInfo;
 import com.neighbor21.ggits.evaluation.common.dto.EvalShtInfoDTO.EvalShtSctrInfo.EvalShtItemInfo;
@@ -39,7 +37,11 @@ import com.neighbor21.ggits.evaluation.common.enums.EvalRtrShtSttsCd;
 import com.neighbor21.ggits.evaluation.common.enums.EvalSttsCd;
 import com.neighbor21.ggits.evaluation.common.enums.FileTypeCd;
 import com.neighbor21.ggits.evaluation.common.mapper.EvalFileMapper;
+import com.neighbor21.ggits.evaluation.common.mapper.EvalRtrListMapper;
 import com.neighbor21.ggits.evaluation.common.mapper.EvalRtrShtMapper;
+import com.neighbor21.ggits.evaluation.common.mapper.EvalShtInfoMapper;
+import com.neighbor21.ggits.evaluation.common.mapper.EvalShtItemMapper;
+import com.neighbor21.ggits.evaluation.common.mapper.EvalShtMapper;
 import com.neighbor21.ggits.evaluation.common.util.GgitsCommonUtils;
 import com.neighbor21.ggits.evaluation.web.service.evalmng.EvalMngService;
 import com.neighbor21.ggits.evaluation.web.service.rater.RaterService;
@@ -59,6 +61,18 @@ public class RaterController {
 
 	@Autowired
 	EvalRtrShtMapper evalRtrShtMapper;
+	
+	@Autowired
+	EvalRtrListMapper evalRtrListMapper;
+	
+	@Autowired
+	EvalShtInfoMapper evalShtInfoMapper;
+	
+	@Autowired
+	EvalShtMapper evalShtMapper;
+	
+	@Autowired
+	EvalShtItemMapper evalShtItemMapper;
 
 	/**
 	 * @Method Name : entercodeCheck
@@ -94,14 +108,21 @@ public class RaterController {
 		if (GgitsCommonUtils.isNull(evalShtInfo)) {
 			return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST, "일치하는 참여 코드가 없습니다.");
 		}
-
+		
+		if(evalRtrListMapper.countAllByShtInfoId(evalShtInfo.getShtInfoId()) < 1) {
+			return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST, "등록된 평가자가 없습니다.");
+		}
+		
 		String shtAllStts = evalShtInfo.getShtAllStts();
 
 		if (GgitsCommonUtils.isNull(evalShtInfo.getShtInfoId())) {
 			return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST, "일치하는 참여 코드가 없습니다.");
-		} else if (!(shtAllStts.equals(EvalSttsCd.EVAL_WAITING.getCode())
+		} else if (
+				!(shtAllStts.equals(EvalSttsCd.EVAL_WAITING.getCode())
 				|| shtAllStts.equals(EvalSttsCd.EVAL_PROGRESS.getCode())
-				|| shtAllStts.equals(EvalSttsCd.EVAL_COMPLETE.getCode()))) {
+				|| shtAllStts.equals(EvalSttsCd.EVAL_COMPLETE.getCode())
+				|| shtAllStts.equals(EvalSttsCd.EVAL_SCORE_GRADING.getCode())
+				)) {
 			return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST, "평가 가능한 평가지가 아닙니다.");
 		}
 
@@ -120,12 +141,7 @@ public class RaterController {
 	 * @return
 	 */
 	@GetMapping("/info/save.do")
-	public String infoSave(Model model, HttpSession session) {
-
-		String shtInfoId = ((EvalShtInfo) session.getAttribute("shtInfoSession")).getShtInfoId();
-		List<EvalRtr> evalRtrList = raterService.findAllEvalRtrByShtInfoId(shtInfoId);
-		model.addAttribute("evalRtrList", evalRtrList);
-
+	public String infoSave(Model model) {
 		return "view/rater/selectRater";
 	}
 
@@ -138,12 +154,24 @@ public class RaterController {
 	 */
 	@PostMapping("/info/check.ajax")
 	public @ResponseBody CommonResponse<?> infoCheckAjax(EvalRtr evalRtrCheck, HttpSession session) {
-
+		
+		ValidateBuilder dtoValidator = new ValidateBuilder(evalRtrCheck);
+		dtoValidator.addRule("rtrNm", new ValidateChecker().setRequired())
+					.addRule("rtrBrthDt", new ValidateChecker().setRequired());
+		ValidateResult dtoValidatorResult = dtoValidator.isValid();
+		
+		if (!dtoValidatorResult.isSuccess()) {
+			return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST, dtoValidatorResult.getMessage());
+		}
+		
 		try {
+			String shtInfoId = ((EvalShtInfo) session.getAttribute("shtInfoSession")).getShtInfoId();
+			evalRtrCheck.setShtInfoId(shtInfoId);
+			
 			EvalRtr evalRtrInfo = raterService.findOneEvalShtInfoByBirtDt(evalRtrCheck);
 
 			if (GgitsCommonUtils.isNull(evalRtrInfo)) {
-				return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST, "평가자 생년월일 정보가 일치하지 않습니다.");
+				return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST, "평가자 이름, 생년월일 정보가 일치하지 않습니다.");
 			}
 
 			session.setAttribute("rtrInfoSession", evalRtrInfo);
@@ -177,15 +205,15 @@ public class RaterController {
 		evalFile.setFileType(FileTypeCd.REQUEST_FOR_PROPOSAL.getFileCode());
 		List<EvalFile> requestFileList = evalFileMapper.findAllByShtInfoIdAndFileType(evalFile);
 
-		evalFile.setFileType(FileTypeCd.OTHER_ATTACHMENT.getFileCode());
-		List<EvalFile> attachmentFileList = evalFileMapper.findAllByShtInfoIdAndFileType(evalFile);
+		evalFile.setFileType(FileTypeCd.PROPOSALS.getFileCode());
+		List<EvalFile> proposalFileList = evalFileMapper.findAllByShtInfoIdAndFileType(evalFile);
 		
 		evalFile.setFileType(FileTypeCd.PRESENTATION_DOC.getFileCode());
 		List<EvalFile> presentationDocFileList = evalFileMapper.findAllByShtInfoIdAndFileType(evalFile);
 
 		model.addAttribute("evalShtInfoDetail", evalShtInfoDetail);
 		model.addAttribute("requestFileList", requestFileList);
-		model.addAttribute("attachmentFileList", attachmentFileList);
+		model.addAttribute("proposalFileList", proposalFileList);
 		model.addAttribute("presentationDocFileList", presentationDocFileList);
 
 		return "view/rater/checkEvalInfo";
@@ -208,6 +236,8 @@ public class RaterController {
 		
 		evalShtInfo.setShtInfoId(shtInfoId);
 		
+		String shtAllStts = evalShtInfoMapper.findOneByShtInfoId(shtInfoId).getShtAllStts();
+		
 		int pageSize = 3;
 		int pageNo = evalShtInfo.getPageNo();
 		int offset = (pageNo - 1) * pageSize;
@@ -227,6 +257,9 @@ public class RaterController {
 				shtInfoId, rtrId, EvalRtrShtSttsCd.EVAL_COMPLETE.getCode()));
 		model.addAttribute("evalBddCmpList", evalBddCmpList);
 		model.addAttribute("paging", paging);
+//		model.addAttribute("qltMaxScr", evalShtMapper.findOneMaxQntScrByShtInfoId(shtInfoId));
+		model.addAttribute("qltMaxScr", evalShtMapper.findOneMaxQltScrByShtInfoId(shtInfoId));
+		model.addAttribute("shtAllStts", shtAllStts);
 
 		return "view/rater/evaluationList";
 	}
@@ -245,8 +278,9 @@ public class RaterController {
 							Model model, HttpSession session) {
 		// 평가지 정보
 		String shtInfoId = ((EvalShtInfo) session.getAttribute("shtInfoSession")).getShtInfoId();
-
-		// 평가자 배점 정보
+		String shtAllStts = evalShtInfoMapper.findOneByShtInfoId(shtInfoId).getShtAllStts();
+		
+		// 평가지 문항, 배점 정보
 		EvalShtInfoDTO evalShtInfoDTO = evalMngService.findAllEvalScrInfo(shtInfoId, shtType);
 
 		// 평가자 점수 DB에 존재 하는지 확인
@@ -255,15 +289,30 @@ public class RaterController {
 		List<EvalRtrSht> evalRtrShtList = evalRtrShtMapper.findAllRtrShtByRtrShtId(rtrShtId);
 		String signFileId = evalRtrShtList.get(0).getFileId();
 		model.addAttribute("signFileId", signFileId);
-
-		if (evalRtrSctrScrs.size() > 0) {
-			String shtStts = evalRtrShtList.get(0).getShtStts();
-			// 평가 완료인 경우
-			if (shtStts.equals(EvalRtrShtSttsCd.EVAL_COMPLETE.getCode())) {
-				Boolean isEvalComplete = true;
-				EvalRaterScrDTO evalRaterScrDTO = new EvalRaterScrDTO();
-				List<ConfirmScrInfo> confirmScrInfoList = new ArrayList<>();
-				List<EvalShtInfoDTO.EvalShtSctrInfo> evalShtSctrList = evalShtInfoDTO.getEvalShtSctrList();
+		
+		// 파일 조회
+		EvalFile evalFile = new EvalFile();
+		evalFile.setShtInfoId(shtInfoId);
+		
+		evalFile.setFileType(FileTypeCd.REQUEST_FOR_PROPOSAL.getFileCode());
+		List<EvalFile> requestFileList = evalFileMapper.findAllByShtInfoIdAndFileType(evalFile);
+		
+		// 해당 기업 파일 조회
+		evalFile.setFileOgnNm(bddCmpNm + "_%");
+		evalFile.setFileType(FileTypeCd.PROPOSALS.getFileCode());
+		List<EvalFile> proposalFileList = evalFileMapper.findAllByShtInfoIdAndFileType(evalFile);
+		
+		evalFile.setFileType(FileTypeCd.PRESENTATION_DOC.getFileCode());
+		List<EvalFile> presentationDocFileList = evalFileMapper.findAllByShtInfoIdAndFileType(evalFile);
+		// 평가 완료인 경우 - 평가 점수 확인 페이지 삭제로 주석
+//		if (evalRtrSctrScrs.size() > 0) {
+//			String shtStts = evalRtrShtList.get(0).getShtStts();
+			
+//			if (shtStts.equals(EvalRtrShtSttsCd.EVAL_COMPLETE.getCode())) {
+//				Boolean isEvalComplete = true;
+//				EvalRaterScrDTO evalRaterScrDTO = new EvalRaterScrDTO();
+//				List<ConfirmScrInfo> confirmScrInfoList = new ArrayList<>();
+//				List<EvalShtInfoDTO.EvalShtSctrInfo> evalShtSctrList = evalShtInfoDTO.getEvalShtSctrList();
 //				int totalMaxScr = 0;
 //				int totalScr = 0;
 //				for (int i = 0; i < evalShtSctrList.size(); i++) {
@@ -310,13 +359,13 @@ public class RaterController {
 //				evalRaterScrDTO.setTotalScr(totalScr);
 //				evalRaterScrDTO.setTotalMaxScr(totalMaxScr);
 //				evalRaterScrDTO.setConfirmScrInfoList(confirmScrInfoList);
-
-				model.addAttribute("bddCmpNm", bddCmpNm);
-				model.addAttribute("isEvalComplete", isEvalComplete);
-				session.setAttribute("evalRaterScrDTOSession", evalRaterScrDTO);
-				return "view/rater/evaluationConfirm";
-			}
-		}
+//
+//				model.addAttribute("bddCmpNm", bddCmpNm);
+//				model.addAttribute("isEvalComplete", isEvalComplete);
+//				session.setAttribute("evalRaterScrDTOSession", evalRaterScrDTO);
+//				return "view/rater/evaluationConfirm";
+//			}
+//		}
 
 		if (evalRtrSctrScrs.size() < 1) {
 			evalShtInfoDTO.setSaveType("save");
@@ -347,7 +396,12 @@ public class RaterController {
 
 			model.addAttribute("totalScr", totalScr);
 			model.addAttribute("totalScrCount", totalScrCount);
+			model.addAttribute("shtAllStts", shtAllStts);
 			model.addAttribute("evalQltInfo", evalShtInfoDTO);
+			
+			model.addAttribute("requestFileList", requestFileList);
+			model.addAttribute("proposalFileList", proposalFileList);
+			model.addAttribute("presentationDocFileList", presentationDocFileList);
 			return "view/rater/evaluationQltSave";
 		}
 
@@ -381,7 +435,7 @@ public class RaterController {
 
 		session.setAttribute("evalRaterScrDTOSession", evalRaterScrDTO);
 
-		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "평가 점수가 정상적으로 입력 되었습니다.");
+		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "평가 점수가 정상적으로 입력되었습니다.");
 	}
 
 	/**
@@ -425,7 +479,7 @@ public class RaterController {
 		
 		Map<String,Object> resultMap = new HashMap<>();
 		boolean isEvalCmplt = false;
-		String message = "평가가 완료 되었습니다.";
+		String message = "평가가 완료되었습니다.";
 		
 		String shtInfoId = ((EvalShtInfo) session.getAttribute("shtInfoSession")).getShtInfoId();
 		String rtrId = ((EvalRtr) session.getAttribute("rtrInfoSession")).getRtrId();
@@ -435,20 +489,27 @@ public class RaterController {
 		// 점수 저장 및 평가지 상태 코드 변경
 		if (saveType.equals("update")) {
 			raterService.updateRtrScr(evaltrItemScrs);
-
-			// 평가 상태 코드 변경
-			raterService.updateAllStts(shtInfoId, rtrId);
-			session.removeAttribute("rtrItemScrsSession");
-			session.removeAttribute("evalRaterScrDTOSession");
 			
-			// 모든 평가 완료 확인
-			if(evalRtrShtMapper.counAllByshtTypeAndShtInfoIdAndRtrIdAndShtStts("qlt",
-					shtInfoId, rtrId, EvalRtrShtSttsCd.EVAL_WAITING.getCode()) == 0) {
-				isEvalCmplt = true;
-				message = "모든 평가가 완료 되었습니다. \n메인 페이지로 이동합니다.";
-				session.invalidate();
+			EvalShtInfo evalShtInfo = evalShtInfoMapper.findOneByShtInfoId(shtInfoId);
+			
+			if(!(evalShtInfo.getShtAllStts().equals(EvalSttsCd.EVAL_SCORE_GRADING.getCode()))) {
+				// 평가 상태 코드 변경
+				raterService.updateAllStts(shtInfoId, rtrId);
+				session.removeAttribute("rtrItemScrsSession");
+				session.removeAttribute("evalRaterScrDTOSession");
+				
+				// 모든 평가 완료 확인
+				if(evalRtrShtMapper.counAllByshtTypeAndShtInfoIdAndRtrIdAndShtStts("qlt",
+						shtInfoId, rtrId, EvalRtrShtSttsCd.EVAL_WAITING.getCode()) == 0) {
+					isEvalCmplt = true;
+					message = "모든 평가가 완료되었습니다.";
+				}
+				
 			}
+			
 			resultMap.put("isEvalCmplt", isEvalCmplt);
+			resultMap.put("shtInfoId", shtInfoId);
+			resultMap.put("rtrId", rtrId);
 			resultMap.put("resultCode", HttpStatus.OK);
 			
 			return CommonResponse.successToData(resultMap, message);
@@ -465,10 +526,12 @@ public class RaterController {
 			if(evalRtrShtMapper.counAllByshtTypeAndShtInfoIdAndRtrIdAndShtStts("qlt",
 					shtInfoId, rtrId, EvalRtrShtSttsCd.EVAL_WAITING.getCode()) == 0) {
 				isEvalCmplt = true;
-				message = "모든 평가가 완료 되었습니다.\n메인 페이지로 이동합니다.";
-				session.invalidate();
+				message = "모든 평가가 완료되었습니다.";
 			}
+
 			resultMap.put("isEvalCmplt", isEvalCmplt);
+			resultMap.put("shtInfoId", shtInfoId);
+			resultMap.put("rtrId", rtrId);
 			resultMap.put("resultCode", HttpStatus.OK);
 			
 			return CommonResponse.successToData(resultMap, message);
@@ -480,12 +543,33 @@ public class RaterController {
 			resultMap.put("isEvalCmplt", isEvalCmplt);
 			resultMap.put("resultCode", HttpStatus.OK);
 			
+			message = "임시저장되었습니다.";
 			return CommonResponse.successToData(resultMap, message);
 		}
 
 		message = "잘못된 접근 입니다.";
 		resultMap.put("resultCode", HttpStatus.BAD_REQUEST);
 		return CommonResponse.successToData(resultMap, message);
+	}
+	
+	/**
+	 * @Method Name : evaluationResult
+	 * @작성일 : 2024.01. 05.
+	 * @작성자 : IK.MOON
+	 * @Method 설명 : 평가 완료페이지 이동
+	 * @return
+	 */
+	@GetMapping("/evaluation/result.do")
+	String evaluationResult(@RequestParam(name = "rtrId", required = true) String rtrId,
+			@RequestParam(name = "shtInfoId", required = true) String shtInfoId,
+			Model model, HttpSession session) {
+		List<Map<String,Object>> totalScrList = evalRtrShtMapper.findAllTotalScr(rtrId, shtInfoId, "qlt");
+		int totalMaxScr = evalShtItemMapper.findTotalMaxScrByShtInfoIdAndShtType(shtInfoId, "qlt");
+		
+		session.invalidate();
+		model.addAttribute("totalScrList", totalScrList);
+		model.addAttribute("totalMaxScr", totalMaxScr);
+		return "view/rater/evaluationResult";
 	}
 
 }

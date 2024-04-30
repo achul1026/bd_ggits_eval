@@ -4,23 +4,23 @@
 <div class="sign-content">
 	<input type="hidden" id="modalShtInfoId" name="modalShtInfoId" />
   	<div class="sign-head">
-	  평가자 목록 <img src="${pageContext.request.contextPath}/statics/images/close-white.png" class="modal-close">
+	  제안평가위원 목록 <img src="${pageContext.request.contextPath}/statics/images/close-white.png" class="modal-close">
 	</div>
 	<div class="sign-body pd32">
 		<form id="modalSearchForm" method="get" onsubmit="return false;">
 			<input type="hidden" id="pageLocation" name="pageLocation" value="raterList" />
 			<input type="hidden" id="modalPageNo" name="modalPageNo" value="1" />
 			<div class="search-plus form wd100">
-				<label>평가자를 선택하세요. (최대 10명)</label>
+				<label>제안평가위원을 선택하세요. (최대 10명)</label>
 				<input type="text" id="modalRaterNm" name="modalRaterNm" placeholder="평가자를 검색해주세요."
-					class="border-input" value="${schRtrNm}" onkeyup="fnRaterListEnterKey('','search')"/>
-				<button type="button" id="addTargetBtn" class="plus-btn mini-btn on-btn" onclick="fnRaterList('','search')">검색</button>
+					class="border-input" value="${schRtrNm}" onkeyup="fnRaterListEnterKey('','search', 'list')"/>
+				<button type="button" id="addTargetBtn" class="plus-btn mini-btn on-btn" onclick="fnRaterList('','search', 'list')">검색</button>
 			</div>
 		</form>
 		
 		<div class="tester-list">
 			<div class="search-plus form wd100">
-				<label>평가자 리스트</label>
+				<label>제안평가위원 리스트</label>
 			</div>
 			 <table>
 	              <colgroup>
@@ -104,10 +104,11 @@
 				</c:otherwise>
 			</c:choose>
 		</div>
+		<div class="check-btn">
+			<button class="mini-btn on-btn" onclick="fnSaveRtrInfo();">확인</button>
+		</div>
 	</div>
-	<div class="center mb32">
-		<button class="mini-btn on-btn" onclick="fnSaveRtrInfo();">확인</button>
-	</div>
+	
  </div>
 <script>
 $('.modal-close').click(function(){

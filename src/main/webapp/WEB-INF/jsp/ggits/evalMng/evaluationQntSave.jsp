@@ -1,9 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <div class="content">
 	<div class="login_wrap">
-		<button type="button" onclick="logout('rater')">
+		<button type="button" onclick="logout('admin')">
 			<img src="${pageContext.request.contextPath}/statics/images/logout.png">
 				로그아웃
 		</button>
@@ -11,73 +12,28 @@
 	<input type="hidden" id="shtInfoId" value="${evalQntInfo.shtInfoId}">
 	<div class="content-head">
 		<img src="${pageContext.request.contextPath}/statics/images/logo.png" class="logo">
-		<h1>평가 화면</h1>
+		<h1>정량적 평가표</h1>
 	</div>
-<!-- 	 <div class="progressbar-wrapper progressbar-wrapper-tablet"> -->
-<!-- 	     <ul class="progressbar"> -->
-<!-- 	          <li class="progress-complete"> -->
-<!-- 	          	<p>평가자 정보 입력</p> -->
-<!-- 	          </li> -->
-<!-- 	          <li class="progress-complete"> -->
-<!-- 	          	<p>평가지 정보 확인</p> -->
-<!-- 	          </li> -->
-<!-- 	           <li class="progress-complete"> -->
-<!-- 	          	<p>평가 목록</p> -->
-<!-- 	          </li> -->
-<!-- 	          <li class="active"> -->
-<!-- 	          	<p>평가 화면</p> -->
-<!-- 	          </li> -->
-<!-- 	          <li> -->
-<!-- 	          	<p>평가점수 확인</p> -->
-<!-- 	          </li> -->
-<!-- 	      </ul> -->
-<!-- 	</div> -->
 	
 	<div class="test-info">
 		<dl>
-			<dt>- 평가 대상 : </dt>
+			<dt>- 평가대상 : </dt>
 			<dd>${evalBddCmp.bddCmpNm}</dd>
 		</dl>
-<!-- 		<dl> -->
-<!-- 			<dt>- 평가 위원명 : </dt> -->
-<!-- 			<dd> -->
-<!-- 				<div id="signDiv"> -->
-<%-- 					<span>${rtrInfoSession.rtrNm}</span> --%>
-<%-- 					<c:if test="${signFileId ne null}"> --%>
-<%-- 					<img src="${pageContext.request.contextPath}/common/sign/image/view.do?fileId=${signFileId}"> --%>
-<!-- 					<input type="hidden" id="signed" value="true"> -->
-<%-- 					</c:if> --%>
-<%-- 					<c:if test="${signFileId eq null}"> --%>
-<!-- 					<button class="name-sign-btn-on"> -->
-<!-- 						(서명) -->
-<!-- 					</button> -->
-<!-- 					<input type="hidden" id="signed" value="false"> -->
-<%-- 					</c:if> --%>
-<!-- 				</div> -->
-<!-- 			</dd> -->
-<!-- 		</dl> -->
 		<dl class="mj0">
-			<dt>- 정량적 평가서명 : </dt>
+			<dt>- 정성적 평가서명 : </dt>
 			<dd>${shtInfoSession.shtNm}</dd>
 		</dl>
 	</div>
 	
 	<div class="table-exel-btn-wrap">
 		<div class="total-score">
-			<div>점수 (<span id="currentScr">0</span>/${totalScr}점)</div> / 
-			<div>문항 (<span id="remainScrCount"></span>/${totalScrCount})</div>
+			<div>현재 점수 (<span id="currentScr">0</span>/${totalScr}점)</div> / 
+			<div>잔여 문항 (<span id="remainScrCount">${totalScrCount}</span>/${totalScrCount})</div>
 		</div>
 	</div>
 	
 	<div class="table-wrap test-table pc-table-qlt">
-		<c:choose>
-			<c:when test="${evalQntInfo.evalShtSctrList[0].evalShtItemList[0].itmNm ne null and evalQntInfo.evalShtSctrList[0].evalShtItemList[0].itmNm eq ''}">
-				<c:set var="isItmNmEmpty" value="true"/>
-			</c:when>
-			<c:otherwise>
-				<c:set var="isItmNmEmpty" value="false"/>
-			</c:otherwise>
-		</c:choose>
 		
 		<c:choose>
 			<c:when test="${evalQntInfo.evalShtSctrList[0].evalShtItemList[0].itmNm ne null and evalQntInfo.evalShtSctrList[0].evalShtItemList[0].itmNm ne ''}">
@@ -96,74 +52,83 @@
 			</c:otherwise>
 		</c:choose>
 		
-		<div class="table-head eval-for-head ${isItmNmEmpty eq 'true' ? 'eval-for-head' : ''}">
+		<div class="table-head
+			<c:choose>
+				<c:when test="${sctrInfo eq 'onlySctr'}">
+					eval-three-head
+				</c:when>
+				<c:when test="${sctrInfo eq 'sctrItem'}">
+					eval-for-head
+				</c:when>
+				<c:when test="${sctrInfo eq 'sctrItemElmnt'}">
+					eval-all-head
+				</c:when>
+			</c:choose>
+		">
 			<ul>
 				<li>평가부문</li>
-				<c:if test="${isItmNmEmpty eq 'false'}">
+				<c:if test="${sctrInfo ne 'onlySctr'}">
 				<li>항목</li>
 				</c:if>
-				<li>배점</li>
+				<c:if test="${sctrInfo eq 'sctrItemElmnt'}">
+				<li>요소</li>
+				</c:if>
+				<li>한도</li>
 				<li>배점표</li>
 			</ul>
 		</div>
 	<c:set var="scrCount" value="0"/>
 	<c:forEach var="evalShtSctrList" items="${evalQntInfo.evalShtSctrList}">
-		<div class="table-body eval-for-body-width ${isItmNmEmpty eq 'true' ? 'rater-three-qlt-body-width' : ''}">
+		<div class="table-body 
+			<c:choose>
+				<c:when test="${sctrInfo eq 'onlySctr'}">
+					eval-three-body-width
+				</c:when>
+				<c:when test="${sctrInfo eq 'sctrItem'}">
+					eval-for-body-width
+				</c:when>
+				<c:when test="${sctrInfo eq 'sctrItemElmnt'}">
+					eval-all-body-width
+				</c:when>
+			</c:choose>
+		">
 		
 			<!-- 부문 -->
-			<div class="table-list sub-head ${isItmNmEmpty eq 'true' ? 'qlt-width-on' : ''}" 
-				id="fldSctr">${evalShtSctrList.fldSctr}</div>
+			<div class="table-list sub-head " 
+				id="fldSctr"><div class="whspace">${evalShtSctrList.fldSctr}</div></div>
 				
 			<div class="table-list sub-body">
 				<c:forEach var="evalShtItemList" items="${evalShtSctrList.evalShtItemList}">
 					<div class="table-sub-list table-qlt-sub-list">
 					
-					<c:if test="${isItmNmEmpty eq 'false'}">
+					<c:if test="${sctrInfo ne 'onlySctr'}">
 						<!-- 항목 -->
-						<div class="addFldItmUl changUl">${evalShtItemList.itmNm}</div>
+						<div class="addFldItmUl changUl"><div class="whspace">${evalShtItemList.itmNm}</div></div>
+					</c:if>
+					<c:if test="${sctrInfo eq 'sctrItemElmnt'}">
+						<!-- 요소 -->
+						<div class="addFldItmUl changUl"><div class="whspace">${evalShtItemList.itmElmnt}</div></div>
 					</c:if>
 					
-						<div id="maxScr" data-max-scr="${evalShtItemList.evalShtQntScrInfo.fldScr}">
-							<!-- 배점 -->
-							${evalShtItemList.evalShtQntScrInfo.fldScr}점
-						</div>
+						<!-- 배점 -->
+						<div id="maxScr" data-max-scr="${evalShtItemList.evalShtQntScrInfo.fldScr}"><fmt:parseNumber value="${evalShtItemList.evalShtQntScrInfo.fldScr}" integerOnly="true"/></div>
 						<!-- 배점표 -->
 						<div class="addRemoveBtnUl changUl table-list-text-center">
 							<!-- 점수 보이기 버튼 check-list-btn-->
-							<div class="check-list-btn" id="scr${scrCount }">0</div>
+							<div class="check-list-btn" id="scr${scrCount}">채점</div>
 							  <div class="sign-wrap test-list-wrap" >
 								  <div class="scoreDiv sign-content">
 									  	<div class="sign-head">
-										 점수설정 <img src="${pageContext.request.contextPath}/statics/images/close-white.png" class="close">
+										 평가점수 <img src="${pageContext.request.contextPath}/statics/images/close-white.png" class="close" onclick="fnCancelScr('${scrCount}')">
 										</div>
 										<div class="sign-body test-list-text check-list">
-											<div class="check-list-about-text">평가점수를 선택해 주세요.</div>
-												<input type="hidden" class="shtItmId" value="${evalShtItemList.shtItmId}">
-												<input type="hidden" name="rtrShtId" value="${rtrShtId}">
-											<ul class="test-table">
-												<c:set var="fldScr" value="${evalShtItemList.evalShtQntScrInfo.fldScr}"/>
-												<c:forEach begin="1" end="${fldScr}" step="1" varStatus="fldScrStatus">
-													<c:choose>
-														<c:when test="${fn:length(evalRtrSctrScrs) eq 0}">
-															<li>
-																<input type="radio" class="scr" name="scr${scrCount}" value="${fldScrStatus.count}" onclick="fnCountRemainScr()">
-																<label id="scrSelected${scrCount}">${fldScrStatus.count}점</label>
-															</li>
-														</c:when>
-														<c:otherwise>
-															<c:forEach var="evalRtrSctrScr" items="${evalRtrSctrScrs }">
-																<c:if test="${ evalShtItemList.shtItmId eq evalRtrSctrScr.shtItmId}">
-																	<li>
-																		<input type="radio" class="scr" name="scr${scrCount }" value="${fldScrStatus.index }" ${fldScrStatus.count eq evalRtrSctrScr.scr ? 'checked':''} onclick="fnCountRemainScr()">
-																		<label id="scrSelected${scrCount }">${fldScrStatus.index }점</label>
-																	</li>
-																</c:if>						
-															</c:forEach>
-														</c:otherwise>
-													</c:choose>
-												</c:forEach>
-													
-											</ul>
+											<div class="check-list-about-text">평가점수를 입력해 주세요. (최대 <fmt:parseNumber value="${evalShtItemList.evalShtQntScrInfo.fldScr}" integerOnly="true"/>점)</div>
+											<input type="hidden" class="shtItmId" value="${evalShtItemList.shtItmId}">
+<%-- 											<input type="hidden" name="rtrShtId" value="${rtrShtId}"> --%>
+											
+											<input type="text" class="scr" name="scr${scrCount}" 
+												oninput="checkScr(this, ${evalShtItemList.evalShtQntScrInfo.fldScr})" 
+												style="background-color: #EFEFEF; width: 100% !important; margin-top: 10px;">
 											
 											<div class="check-btn">
 												<button type="button" class="mini-btn mini-sub-btn on-btn" onClick="fnScrTextChange('${scrCount }')">확인</button>
@@ -172,6 +137,88 @@
 										
 								  </div>
 								</div>
+								
+								<!-- 채점 방식 변경 전 -->
+<!-- 							  <div class="sign-wrap test-list-wrap" > -->
+<!-- 								  <div class="scoreDiv sign-content"> -->
+<!-- 									  	<div class="sign-head"> -->
+<%-- 										 평가점수 <img src="${pageContext.request.contextPath}/statics/images/close-white.png" class="close" onclick="fnCancelScr('${scrCount}')"> --%>
+<!-- 										</div> -->
+<!-- 										<div class="sign-body test-list-text check-list"> -->
+<!-- 											<div class="check-list-about-text">평가점수를 선택해 주세요.</div> -->
+<%-- 											<input type="hidden" class="shtItmId" value="${evalShtItemList.shtItmId}"> --%>
+<%-- 											<input type="hidden" name="rtrShtId" value="${rtrShtId}"> --%>
+<!-- 											<ul class="test-table"> -->
+<%-- 												<c:set var="fldScr" value="${evalShtItemList.evalShtQntScrInfo.fldScr}"/> --%>
+<%-- 												<fmt:parseNumber var="fldScr" value="${fldScr}" integerOnly="true"/> --%>
+<%-- 												<c:forEach begin="1" end="5" step="1" varStatus="fldScrStatus"> --%>
+<%-- 													<c:choose> --%>
+<%-- 														<c:when test="${fn:length(evalRtrSctrScrs) eq 0}"> --%>
+<%-- 															<c:choose> --%>
+<%-- 																<c:when test="${fldScrStatus.count ne 1}"> --%>
+<%-- 																	<c:if test="${fldScrStatus.count eq 2}"> --%>
+<%-- 																		<c:set var="percentage" value="0.9"/> --%>
+<%-- 																	</c:if> --%>
+<%-- 																	<c:if test="${fldScrStatus.count eq 3}"> --%>
+<%-- 																		<c:set var="percentage" value="0.8"/> --%>
+<%-- 																	</c:if> --%>
+<%-- 																	<c:if test="${fldScrStatus.count eq 4}"> --%>
+<%-- 																		<c:set var="percentage" value="0.7"/> --%>
+<%-- 																	</c:if> --%>
+<%-- 																	<c:if test="${fldScrStatus.count eq 5}"> --%>
+<%-- 																		<c:set var="percentage" value="0.6"/> --%>
+<%-- 																	</c:if> --%>
+																	
+<%-- 																	<fmt:formatNumber var="percentagedScr" value="${fldScr * percentage}" pattern=".0"/> --%>
+<%-- 																	<fmt:formatNumber type="number" var="percentagedText" value="${100 * percentage}"/> --%>
+<%-- 																	<fmt:parseNumber var="intScr" value="${percentagedScr}" integerOnly="true"/> --%>
+<%-- 																	<c:if test="${percentagedScr - intScr eq 0}"> --%>
+<%-- 																		<c:set var="percentagedScr" value="${intScr}"/> --%>
+<%-- 																	</c:if> --%>
+<!-- 																	<li onclick="fnChckChildRadioBtn(this)"> -->
+<!-- 																		<div> -->
+<%-- 																			<input type="radio" class="scr" name="scr${scrCount}" value="${percentagedScr}"> --%>
+<%-- 																			<label id="scrSelected${scrCount}">${percentagedScr}점</label>															 --%>
+<!-- 																		</div> -->
+																		
+<!-- 																		<div class="point-text"> -->
+<%-- 																			배점의 ${percentagedText}% --%>
+<!-- 																		</div> -->
+																		
+<!-- 																	</li> -->
+																
+<%-- 																</c:when> --%>
+<%-- 																<c:otherwise> --%>
+<!-- 																	<li onclick="fnChckChildRadioBtn(this)"> -->
+<!-- 																		<div> -->
+<%-- 																			<input type="radio" class="scr" name="scr${scrCount}" value="${fldScr}"> --%>
+<%-- 																			<label id="scrSelected${scrCount}">${fldScr}점</label> --%>
+<!-- 																		</div> -->
+																		
+<!-- 																		<div class="point-text">배점의 100%</div> -->
+<!-- 																	</li> -->
+<%-- 																</c:otherwise> --%>
+<%-- 															</c:choose> --%>
+<%-- 														</c:when> --%>
+<%-- 														<c:otherwise> --%>
+<!-- 															<li onclick="fnChckChildRadioBtn(this)"> -->
+<%-- 																<input type="radio" class="scr" name="scr${scrCount}" value="${fldScr}"  --%>
+<%-- 																	${fldScr eq evalRtrSctrScr.scr ? 'checked':''}> --%>
+<%-- 																<label id="scrSelected${scrCount}">${fldScr}점</label> --%>
+<!-- 															</li> -->
+<%-- 														</c:otherwise> --%>
+<%-- 													</c:choose> --%>
+<%-- 												</c:forEach> --%>
+													
+<!-- 											</ul> -->
+											
+<!-- 											<div class="check-btn"> -->
+<%-- 												<button type="button" class="mini-btn mini-sub-btn on-btn" onClick="fnScrTextChange('${scrCount }')">확인</button> --%>
+<!-- 											</div> -->
+<!-- 										</div> -->
+										
+<!-- 								  </div> -->
+<!-- 								</div> -->
 						</div>
 						<c:set var="scrCount" value="${scrCount + 1}"/>
 						
@@ -210,13 +257,9 @@
 
 <script type="text/javascript">
 
-// 	var totalScrVar = ${totalScr};
-
 	var totalScrCountVar = ${totalScrCount};
-// 	var totalScrCountVar = 1;
 	var scrCountVar = ${scrCount};
 	var isAllScrChecked = false;
-	var rtrNm = '${rtrInfoSession.rtrNm}';
 	
 	function fnSaveBySaveType(saveType) {
 
@@ -229,19 +272,19 @@
 		
 		tableBody.each(function(idx,item){
 			var confirmScrInfo = new Object();
-//			var fldSctr = $(item).find("#fldSctr").val();
 			var fldSctr = $(item).find("#fldSctr").text();
-			var sctrScr = 0;
-			var sctrMaxScr = 0;
+// 			var sctrScr = 0;
+// 			var sctrMaxScr = 0;
 			var tableSubList = $(item).find(".table-sub-list");
 			tableSubList.each(function(scrIdx,scrItem){
-				var scr = $(scrItem).find("input[class='scr']:checked").val();
+// 				var scr = $(scrItem).find("input[class='scr']:checked").val();
+				var scr = $(scrItem).find("input[class='scr']").val();
 				var maxScr = $(scrItem).find("#maxScr").data("max-scr");
-				sctrScr += Number(scr);
-				sctrMaxScr += Number(maxScr);
+// 				sctrScr += Number(scr);
+// 				sctrMaxScr += Number(maxScr);
 				
-				totalScr += Number(scr);
-				totalMaxScr += Number(maxScr);
+// 				totalScr += Number(scr);
+// 				totalMaxScr += Number(maxScr);
 				
 				var evalShtQntScr = new Object();
 				var shtItmId = $(scrItem).find(".shtItmId").val(); 
@@ -252,100 +295,52 @@
 				evalShtQntScr.rtrShtId = rtrShtId;
 				evalShtQltScrList.push(evalShtQntScr);
 			})
-			confirmScrInfo.scr = sctrScr; 
-			confirmScrInfo.fldSctr = fldSctr; 
-			confirmScrInfo.maxScr = sctrMaxScr;
-			confirmScrInfoList.push(confirmScrInfo);
+// 			confirmScrInfo.scr = sctrScr; 
+// 			confirmScrInfo.fldSctr = fldSctr; 
+// 			confirmScrInfo.maxScr = sctrMaxScr;
+// 			confirmScrInfoList.push(confirmScrInfo);
 		})
 		
-		evalRaterScrDTO.totalScr = totalScr;
-		evalRaterScrDTO.totalMaxScr = totalMaxScr;
+// 		evalRaterScrDTO.totalScr = totalScr;
+// 		evalRaterScrDTO.totalMaxScr = totalMaxScr;
 		evalRaterScrDTO.evalRtrItemScrList = evalShtQltScrList; 
 		evalRaterScrDTO.confirmScrInfoList = confirmScrInfoList;
 		
 		if (saveType == 'save' || saveType == 'update') {
 			evalRaterScrDTO.saveType = saveType;
 			if(isAllScrChecked) {
-					if(confirm('평가를 제출하시겠습니까?')) {
-						$.ajax({
-							type : "post",
-							contentType: "application/json; charset=UTF-8",
-							data : JSON.stringify(evalRaterScrDTO),
-							url : "${pageContext.request.contextPath}/evaluation/management/eval/${evalQntInfo.shtInfoId}/save.ajax?bddCmpId=${evalBddCmp.bddCmpId}",
-							success : function(result) {
-								let resultCode = result.code;
-								let resultMessage = result.message;
-								if (resultCode == '200') {
-									alert(resultMessage);
-									window.location.href="${pageContext.request.contextPath}/evaluation/management/eval/list.do?shtInfoId=${evalQntInfo.shtInfoId}&shtNm=${shtInfoSession.shtNm}";
-								} else {
-									alert(resultMessage);
-								}
+				if(confirm('평가를 제출하시겠습니까?')) {
+					$.ajax({
+						type : "post",
+						contentType: "application/json; charset=UTF-8",
+						data : JSON.stringify(evalRaterScrDTO),
+						url : "${pageContext.request.contextPath}/evaluation/management/eval/${evalQntInfo.shtInfoId}/save.ajax?bddCmpId=${evalBddCmp.bddCmpId}",
+						success : function(result) {
+							let resultCode = result.code;
+							let resultMessage = result.message;
+							if (resultCode == '200') {
+								alert(resultMessage);
+								window.location.href="${pageContext.request.contextPath}/evaluation/management/eval/list.do?shtInfoId=${evalQntInfo.shtInfoId}&shtNm=${shtInfoSession.shtNm}";
+							} else {
+								alert(resultMessage);
 							}
-						});
-					}
+						}
+					});
+				}
 			} else {
-				alert('평가 점수를 모두 입력해 주세요.');
+				alert('채점이 완료되지 않은 문항이 있습니다.');
 			}
 		}
 	}	
 	
-// 	$("#saveSignBtn").on("click",function(){
-// 		if(!confirm("서명을 저장하시겠습니까? \n저장한 서명은 수정할 수 없습니다.")){
-// 			return;
-// 		}
-		
-// 		var shtInfoId = $("#shtInfoId").val();
-// 		var rtrShtId = '${rtrShtId}';
-		
-// 		var canvas = document.getElementById('signatureCanvas');
-// 		var imgBase64 = canvas.toDataURL('image/png', 'image/octet-stream');
-// 		var decodImg = atob(imgBase64.split(',')[1]);
-
-// 	    let array = [];
-// 	    for (let i = 0; i < decodImg.length; i++) {
-// 	       array.push(decodImg.charCodeAt(i));
-// 	    }
-
-// 	    var file = new Blob([ new Uint8Array(array) ], {
-// 	       type : 'image/png'
-// 	    });
-// 	    var fileName = 'sign_' + getDateFormatYYYYMMDDMISS() + '.png';
-// 	    let formData = new FormData();
-// 	    formData.append('file', file, fileName);
-// 	    formData.append('shtInfoId', shtInfoId);
-// 	    formData.append('rtrShtId', rtrShtId);
-
-// 	    $.ajax({
-// 	       type : 'post',
-// 	       url : '${pageContext.request.contextPath}/common/sign/upload.ajax',
-// 	       cache : false,
-// 	       data : formData,
-// 	       processData : false,
-// 	       contentType : false,
-// 	       success : function(result) {
-// 				let html = "";
-// 				let fileId = result.data.fileId;
-				
-// 				$('#signDiv').empty();
-// 				html += '<span>'+rtrNm+'</span>';
-// 				html += '<img src="${pageContext.request.contextPath}/common/sign/image/view.do?fileId='+fileId+'">';
-// 				html += '<input type="hidden" id="signed" value="true">';
-// 				$('#signDiv').append(html);
-				
-// 				$('.sign-wrap').hide();
-// 				$("html, body").removeClass("not_scroll");
-// 	       }
-// 	   })
-		
-//    });
-	
 	function fnCountRemainScr() {
 		let checkedScr = 0;
 		for(i = 0; i < scrCountVar; i++) {	
-			var scr = $("input[name='scr"+i+"']:checked").val();
-			if(scr != null) {
-				$('#scr' + i).text(scr);
+// 			var scr = $("input[name='scr"+i+"']:checked").val();
+			var scr = $("input[name='scr"+i+"']").val();
+// 			if(scr != null) {
+			if(scr != '') {
+// 				$('#scr' + i).text(scr);
 				checkedScr++;
 			}
 		}
@@ -359,121 +354,105 @@
 	
 	function fnCalcCurrentScr() {
 		let currentScrVar = 0;
+		
 		for(i = 0; i < scrCountVar; i++) {	
-			var scr = $("input[name='scr"+i+"']:checked").val();
+			var scr = $("input[name='scr"+i+"']").val();
 			
-			if(scr != null) {
+// 			if(scr != null) {
+			if(scr != '') {
 				currentScrVar += Number(scr);
 			}
+		}
+		currentScrVar = currentScrVar.toFixed(2);
+		if (currentScrVar.endsWith('.00')) {
+			currentScrVar = currentScrVar.slice(0, -3)
 		}
 		
 		$('#currentScr').text(currentScrVar);
 	}
 	
 	function fnScrTextChange(idx) {
-		var scrChecked = $("input[name='scr"+idx+"']:checked").val();
-		$('#scr' + idx).text(scrChecked);
+		let checkedScrCnt = 0;
+		let currentScrVar = 0;
 		
-		fnCalcCurrentScr();
+// 		var scr = $("input[name='scr"+idx+"']:checked").val();
+		var scr = $("input[name='scr"+idx+"']").val();
+		
+		scr = Number(scr);
+		
+		if (scr == '') {
+			$("#scr" + idx).text('채점');
+		} else {
+			$('#scr' + idx).text(scr);
+			$("input[name='scr"+idx+"']").val(scr);
+		};
+
+		for(i = 0; i < scrCountVar; i++) {
+// 			var scrChecked = $("input[name='scr"+i+"']:checked").val();
+			var scrChecked = $("input[name='scr"+i+"']").val();
+// 			if(scrChecked != null) {
+			if(scrChecked != '') {
+				checkedScrCnt++;
+				currentScrVar += Number(scrChecked);
+			}
+		}
+		
+		let remainScrCount = totalScrCountVar - checkedScrCnt;
+		$('#remainScrCount').text(remainScrCount);
+		
+		if(remainScrCount == 0) {
+			isAllScrChecked = true;
+		}
+		
+		$('#remainScrCount').text(totalScrCountVar - checkedScrCnt);
+		
+		currentScrVar = currentScrVar.toFixed(2);
+		if (currentScrVar.endsWith('.00')) {
+			currentScrVar = currentScrVar.slice(0, -3);
+		}
+		
+		$('#currentScr').text(currentScrVar);
 		
 		$('.sign-wrap').hide();
 		$("html, body").removeClass("not_scroll");
 	}
 	
-	(function() {
-		fnCountRemainScr();
-		fnCalcCurrentScr();
-	})();
+	function fnCancelScr(idx) {
+// 		$("input[name='scr"+idx+"']:checked").prop("checked", false);
+		$("input[name='scr"+idx+"']").val('');
+		$("#scr"+idx).text('채점');
+		isAllScrChecked = false;
+		$('.sign-wrap').hide();
+		$("html, body").removeClass("not_scroll");
+		 fnCountRemainScr();
+		 fnCalcCurrentScr();
+	}
 	
+// 	(function() {
+// 		fnCountRemainScr();
+// 		fnCalcCurrentScr();
+// 	})();
 	
-	// 서명
-// 	$(document).ready(function() {
-// 	    var canvas = $('#signatureCanvas')[0];
-// 	    var ctx = canvas.getContext('2d');
-// 	    var drawing = false;
-
-// 	    function resizeCanvas() {
-// 	        // 서명 영역의 너비와 높이 설정
-// 	        var canvasWidth = 416;
-// 	        var canvasHeight = 200; // 원하는 높이로 조정
-// 	        canvas.width = canvasWidth;
-// 	        canvas.height = canvasHeight;
-
-// 	        enableTouchDrawing();
-// 			enableMouseDrawing();
-// 	    }
-
-// 	    // 페이지 로딩 시 Canvas 크기 설정
-// 	    resizeCanvas();
-
-// 	    // 윈도우 크기 변경 시 Canvas 크기 다시 조정
-// 	    $(window).resize(function() {
-// 	        resizeCanvas();
-// 	    });
-
-// 		 function enableMouseDrawing() {
-// 		        canvas.addEventListener('mousedown', function() {
-// 		            drawing = true;
-// 		            ctx.lineWidth = 4; // 선 굵기 설정
-// 		            ctx.strokeStyle = '#000'; // 선 색상 설정
-// 		            ctx.beginPath();
-// 		        });
+	function checkScr(scrElmnt, maxScr) {
+		let scr = Number(scrElmnt.value);
 		
-// 		        canvas.addEventListener('mousemove', function(e) {
-// 		            if (drawing) {
-// 		                ctx.lineTo(e.clientX - canvas.getBoundingClientRect().left, e.clientY - canvas.getBoundingClientRect().top);
-// 		                ctx.stroke();
-// 		            }
-// 		        });
+		if(isNaN(scr)) {
+			scrElmnt.value = '';
+			return false;
+		}
 		
-// 		        canvas.addEventListener('mouseup', function() {
-// 		            drawing = false;
-// 		            ctx.closePath();
-// 		        });
-// 		    }
+		if (scr > maxScr) {
+			scrElmnt.value = '';
+			return false;
+		}
+				
+		const pattern = /^\d+(\.\d{1,2})?$/;
+		
+		if (!pattern.test(scr)) {
+			scrElmnt.value = '';
+			return false;
+		}
 
-// 	    function enableTouchDrawing() {
-// 	        canvas.addEventListener('touchstart', function(e) {
-// 	            drawing = true;
-// 	            ctx.lineWidth = 4; // 선 굵기 설정
-// 	            ctx.strokeStyle = '#000'; // 선 색상 설정
-// 	            ctx.beginPath();
-// 	            ctx.moveTo(e.touches[0].clientX - canvas.getBoundingClientRect().left, e.touches[0].clientY - canvas.getBoundingClientRect().top);
-// 	        });
+	}
 
-// 	        canvas.addEventListener('touchmove', function(e) {
-// 	            if (drawing) {
-// 	                ctx.lineTo(e.touches[0].clientX - canvas.getBoundingClientRect().left, e.touches[0].clientY - canvas.getBoundingClientRect().top);
-// 	                ctx.stroke();
-// 	            }
-// 	        });
-
-// 	        canvas.addEventListener('touchend', function() {
-// 	            drawing = false;
-// 	            ctx.closePath();
-// 	        });
-// 	    }
-
-// 	    // 다시 그리기 버튼 클릭 이벤트 처리
-// 	    $('#clearSignature').click(function() {
-// 	        ctx.clearRect(0, 0, canvas.width, canvas.height);
-// 	    });
-
-// 		$(window).resize(function(){
-// 		if (window.innerWidth > 1281) {  
-// 			enableMouseDrawing();
-
-// 		} else {
-// 			enableTouchDrawing();
-// 		}
-
-// 	}).resize();
-	 
-// 	    // 다시 그리기 버튼 클릭 이벤트 처리
-// 	    $('#clearSignature').click(function() {
-// 	        ctx.clearRect(0, 0, canvas.width, canvas.height);
-// 	    });
-	   
-// 	});
-	
 </script>

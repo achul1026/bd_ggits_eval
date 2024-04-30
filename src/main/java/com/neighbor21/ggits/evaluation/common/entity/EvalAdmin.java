@@ -34,11 +34,4 @@ public class EvalAdmin {
     this.userPw = userPw;
   }
 
-//  	public static void main(String[] args) {
-//  		int uuidtoMake = 1;
-//  		for(int i = 0; i< uuidtoMake; i ++) {
-//  			System.out.println(GgitsCommonUtils.getUuid());
-//  		}
-//		
-//	}
 }

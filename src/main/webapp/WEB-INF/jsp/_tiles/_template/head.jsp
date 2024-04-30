@@ -10,3 +10,9 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/statics/css/font.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/statics/css/reset.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/statics/css/jquery-ui.css">
+<link rel="icon" type="image/png" sizes="192x192"  href="${pageContext.request.contextPath}/statics/favicon/android-icon-192x192.png">
+
+<link rel="manifest" href="${pageContext.request.contextPath}/statics/favicon/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="${pageContext.request.contextPath}/statics/favicon/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">

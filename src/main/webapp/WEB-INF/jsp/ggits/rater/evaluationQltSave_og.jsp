@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<div class="wrap">
 <div class="content">
 	<div class="login_wrap">
 		<button type="button" onclick="logout('rater')">
@@ -16,30 +17,27 @@
 	 <div class="progressbar-wrapper progressbar-wrapper-tablet">
 	     <ul class="progressbar">
 	          <li class="progress-complete">
-	          	<p>평가자 정보 입력</p>
+	          	<p>제안평가<br>위원회 인증</p>
 	          </li>
 	          <li class="progress-complete">
-	          	<p>평가지 정보 확인</p>
+	          	<p>제안평가<br>정보 확인</p>
 	          </li>
 	           <li class="progress-complete">
-	          	<p>평가 목록</p>
+	          	<p>제안평가 목록</p>
 	          </li>
 	          <li class="active">
-	          	<p>평가 화면</p>
-	          </li>
-	          <li>
-	          	<p>평가점수 확인</p>
+	          	<p>제안평가위원회<br>점수 확인</p>
 	          </li>
 	      </ul>
 	</div>
 	
 	<div class="test-info">
 		<dl>
-			<dt>- 평가 대상 : </dt>
+			<dt>- 제안평가위원회 대상 : </dt>
 			<dd>${bddCmpNm}</dd>
 		</dl>
 		<dl>
-			<dt>- 평가 위원명 : </dt>
+			<dt>- 제안평가위원회 위원명 : </dt>
 			<dd>
 				<div id="signDiv">
 					<span>${rtrInfoSession.rtrNm}</span>
@@ -75,7 +73,7 @@
 				<c:set var="isItmNmEmpty" value="false"/>
 			</c:otherwise>
 		</c:choose>
-		<div class="table-head pc-table-qlt-head ${isItmNmEmpty eq 'true' ? 'rater-three-qlt-head' : ''}">
+		<div class="table-head eval-for-head ${isItmNmEmpty eq 'true' ? 'rater-three-qlt-head' : ''}">
 			<ul>
 				<li>평가부문</li>
 				<c:if test="${isItmNmEmpty eq 'false'}">
@@ -185,7 +183,7 @@
 		
   </div>
 </div>
-
+</div>
 <script type="text/javascript">
 
 // 	var totalScrVar = ${totalScr};

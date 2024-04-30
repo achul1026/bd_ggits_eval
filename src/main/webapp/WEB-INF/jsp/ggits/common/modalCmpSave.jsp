@@ -4,12 +4,12 @@
 <div class="sign-content">
 	<input type="hidden" id="modalShtInfoId" name="modalShtInfoId" />
   	<div class="sign-head">
-	  평가기업 추가하기 <img src="${pageContext.request.contextPath}/statics/images/close-white.png" class="modal-close">
+	  제안평가위원회 기업 추가하기 <img src="${pageContext.request.contextPath}/statics/images/close-white.png" class="modal-close">
 	</div>
 	<div class="sign-body">
 		<form id="modalCmpyForm" onsubmit="return false;">
 			<div class="company-list form">
-				<label>평가 대상(평가업체)</label>
+				<label>평가 대상(평가 업체)</label>
 				<input type="text" id="bddCmpNm" name="bddCmpNm" placeholder="평가 대상을 입력해주세요."/>
 				<input type="hidden" id="modalShtInfoId" name="modalShtInfoId"/>
 			</div>
@@ -109,7 +109,6 @@ $(".uploadFile").click(function() {
 	        dataTranster.items.add(file);
 	    });
     	requestForProposalFile.prop('files',dataTransfer.files);
-	    console.log(requestForProposalFile)
     });
 });
 // $(".uploadFile").on('change',function(){
@@ -186,7 +185,6 @@ function removeFileBtn(fileId,idx,removeFileType){
 		var removeFile = "";
 		if(removeFileType == 'requestForProposal'){
 			removeFile = $("#requestForProposaFileWrap .inner-file");
-			console.log(removeFile.length)
 			if(removeFile.length == 1){
 				$("#requestForProposaFileWrap").addClass("display-none");			
 			}
@@ -211,7 +209,6 @@ function removeFileBtn(fileId,idx,removeFileType){
 function fnModalSaveBtn(){
 	var modalShtInfoId = $("#modalShtInfoId").val();
 	var formData = new FormData($('#modalCmpyForm')[0]);
-	console.log(requestForProposalFile[0].files)
 // 	if($("#modalCmpyForm").soValid()){
 // 		$.ajax({
 //    			type : "post",

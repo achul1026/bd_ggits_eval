@@ -13,13 +13,15 @@
 									SHT_ITM_ID, 
 									SCR_NM, 
 									SCR,
-									SCR_ORDR
+									SCR_ORDR,
+									SCR_TYPE
 									)VALUES(
 									#{qltScrId}, 
 									#{shtItmId}, 
 									#{scrNm}, 
 									#{scr},
-									#{scrOrdr}
+									#{scrOrdr},
+									#{scrType}
 									);
 		
 	</insert>
@@ -28,6 +30,7 @@
 		SELECT 
 				QLT_SCR_ID, 
 				SHT_ITM_ID, 
+				SCR_TYPE,
 				SCR_NM, SCR, 
 				SCR_ORDR
 		FROM 	EVAL_SHT_QLT_SCR
@@ -41,6 +44,7 @@
 		SET 	
 				SCR_NM=#{scrNm}, 
 				SCR=#{scr}, 
+				SCR_TYPE=#{scrType}, 
 				SCR_ORDR=#{scrOrdr}
 		WHERE 	QLT_SCR_ID=#{qltScrId};
 	</update>
@@ -49,6 +53,7 @@
 		SELECT 
 				QLT_SCR_ID, 
 				SHT_ITM_ID, 
+				SCR_TYPE,
 				FLD_SCR
 		FROM 	EVAL_SHT_QLT_SCR
 		WHERE	SHT_ITM_ID = #{shtItmId}

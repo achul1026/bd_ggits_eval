@@ -12,7 +12,6 @@ public class Paging {
     private int finalPageNo; // 마지막 페이지 번호
     private int totalCount; // 게시 글 전체 수
  
-    //TODO:: 페이징 기능 체크후 디테일 작업 필요 생성자, 디폴트 값 
     /**
      * @return the pageSize
      */

@@ -12,7 +12,8 @@
 								FILE_OGN_NM, 
 								FILE_EXTNSN, 
 								FILE_PATH, 
-								FILE_SIZE
+								FILE_SIZE,
+								CRT_DT
 							)VALUES(
 								#{fileId}, 
 								#{shtInfoId}, 
@@ -21,7 +22,8 @@
 								#{fileOgnNm},
 								#{fileExtnsn},
 								#{filePath},
-								#{fileSize}
+								#{fileSize},
+								NOW(6)
 							);
 	</insert>
 	
@@ -64,6 +66,10 @@
 		FROM 	EVAL_FILE
 		WHERE 	SHT_INFO_ID = #{shtInfoId}
 		AND		FILE_TYPE	= #{fileType}
+		<if test="fileOgnNm != null and fileOgnNm != ''">
+		AND FILE_OGN_NM LIKE #{fileOgnNm}
+		</if>
+		ORDER BY CRT_DT ASC
 	</select>
 	
 	<delete id="deleteByShtInfoId" parameterType="String">

@@ -12,4 +12,10 @@
 	    <property name="username" value="ggits"/>
 	    <property name="password" value="bluedus1!"/>
 	</bean>
+<!--     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"> -->
+<!-- 	    <property name="driverClassName" value="com.mysql.jdbc.Driver"/> -->
+<!-- 	    <property name="url" value="jdbc:mysql://localhost:3306/GGITS_EVAL" /> -->
+<!-- 	    <property name="username" value="ggadmin"/> -->
+<!-- 	    <property name="password" value="ggadmin12#$"/> -->
+<!-- 	</bean> -->
 </beans>

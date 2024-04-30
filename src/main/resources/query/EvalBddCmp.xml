@@ -74,7 +74,7 @@
 				ebc.BDD_CMP_NBR
 		FROM EVAL_BDD_CMP ebc 
 		WHERE ebc.SHT_INFO_ID = #{shtInfoId}
-		ORDER BY ebc.BDD_CMP_NBR DESC
+		ORDER BY ebc.BDD_CMP_NBR
 		<if test="pageNo != null ">
 		LIMIT 3 OFFSET #{pageNo}    	
 		</if>

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<div class="wrap">
 <div class="content">
 	<div class="login_wrap">
 		<button type="button" onclick="logout('rater')">
@@ -11,7 +12,7 @@
 	<input type="hidden" id="shtInfoId" value="${evalShtInfoDTO.shtInfoId}">
 	<div class="content-head">
 		<img src="${pageContext.request.contextPath}/statics/images/logo.png" class="logo">
-		<h1>평가 화면</h1>
+		<h1>제안평가위원회 화면</h1>
 	</div>
 <!-- 	 <div class="progressbar-wrapper progressbar-wrapper-tablet"> -->
 <!-- 	     <ul class="progressbar"> -->
@@ -106,7 +107,7 @@
 					
 						<div id="maxScr" data-max-scr="${evalShtItemList.evalShtQntScrInfo.fldScr}">
 							<!-- 배점 -->
-							${evalShtItemList.evalShtQntScrInfo.fldScr}점
+							${evalShtItemList.evalShtQntScrInfo.fldScr}
 						</div>
 						<!-- 배점표 -->
 						<div class="addRemoveBtnUl changUl table-list-text-center">
@@ -128,7 +129,7 @@
 														<c:when test="${fn:length(evalRtrSctrScrs) eq 0}">
 															<li>
 																<input type="radio" class="scr" name="scr${scrCount}" value="${fldScrStatus.count}" onclick="fnCountRemainScr()">
-																<label id="scrSelected${scrCount}">${fldScrStatus.count}점</label>
+																<label id="scrSelected${scrCount}">${fldScrStatus.count}</label>
 															</li>
 														</c:when>
 														<c:otherwise>
@@ -136,7 +137,7 @@
 																<c:if test="${ evalShtItemList.shtItmId eq evalRtrSctrScr.shtItmId}">
 																	<li>
 																		<input type="radio" class="scr" name="scr${scrCount }" value="${fldScrStatus.index }" ${fldScrStatus.count eq evalRtrSctrScr.scr ? 'checked':''} onclick="fnCountRemainScr()">
-																		<label id="scrSelected${scrCount }">${fldScrStatus.index }점</label>
+																		<label id="scrSelected${scrCount }">${fldScrStatus.index }</label>
 																	</li>
 																</c:if>						
 															</c:forEach>
@@ -179,14 +180,14 @@
 			<canvas id="signatureCanvas"></canvas>
 			
 			<div class="sign-btn">
-				<button class="mini-btn mini-sub-btn" id="clearSignature">다시그리기</button>
+				<button class="mini-btn mini-sub-btn" id="clearSignature">다시 그리기</button>
 				<button class="mini-btn on-btn" id="saveSignBtn">확인</button>
 			</div>
 		</div>
 		
   </div>
 </div>
-
+</div>
 <script type="text/javascript">
 
 // 	var totalScrVar = ${totalScr};

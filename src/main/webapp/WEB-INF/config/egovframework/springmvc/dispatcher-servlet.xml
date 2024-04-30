@@ -75,6 +75,10 @@
     		<bean class="com.neighbor21.ggits.evaluation.support.interceptor.LoginSessionInterceptor"/>
     	</mvc:interceptor>
     	<mvc:interceptor>
+    		<mvc:mapping path="/rater/info/**"/>
+    		<bean class="com.neighbor21.ggits.evaluation.support.interceptor.RaterSessionInterceptor"/>
+    	</mvc:interceptor>
+    	<mvc:interceptor>
     		<mvc:mapping path="/rater/announcement/**"/>
     		<bean class="com.neighbor21.ggits.evaluation.support.interceptor.RaterSessionInterceptor"/>
     	</mvc:interceptor>

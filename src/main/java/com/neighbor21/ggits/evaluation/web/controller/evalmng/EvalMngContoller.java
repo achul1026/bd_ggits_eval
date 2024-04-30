@@ -1,7 +1,7 @@
 package com.neighbor21.ggits.evaluation.web.controller.evalmng;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +30,10 @@ import com.neighbor21.ggits.evaluation.common.dto.EvalBddCmpInfoSaveDTO;
 import com.neighbor21.ggits.evaluation.common.dto.EvalRaterScrDTO;
 import com.neighbor21.ggits.evaluation.common.dto.EvalResultDTO;
 import com.neighbor21.ggits.evaluation.common.dto.EvalShtInfoDTO;
-import com.neighbor21.ggits.evaluation.common.dto.EvalShtListInfoDTO;
 import com.neighbor21.ggits.evaluation.common.dto.EvalShtInfoDTO.EvalShtSctrInfo;
 import com.neighbor21.ggits.evaluation.common.dto.EvalShtInfoDTO.EvalShtSctrInfo.EvalShtItemInfo;
+import com.neighbor21.ggits.evaluation.common.dto.EvalShtListInfoDTO;
+import com.neighbor21.ggits.evaluation.common.dto.EvalResultDTO.EvalResultRtrInfo;
 import com.neighbor21.ggits.evaluation.common.entity.CommonResponse;
 import com.neighbor21.ggits.evaluation.common.entity.EvalBddCmp;
 import com.neighbor21.ggits.evaluation.common.entity.EvalFile;
@@ -44,6 +45,7 @@ import com.neighbor21.ggits.evaluation.common.entity.EvalShtInfo;
 import com.neighbor21.ggits.evaluation.common.entity.EvalShtQntScr;
 import com.neighbor21.ggits.evaluation.common.entity.Paging;
 import com.neighbor21.ggits.evaluation.common.enums.EvalRtrShtSttsCd;
+import com.neighbor21.ggits.evaluation.common.enums.EvalSttsCd;
 import com.neighbor21.ggits.evaluation.common.enums.FileTypeCd;
 import com.neighbor21.ggits.evaluation.common.mapper.EvalBddCmpMapper;
 import com.neighbor21.ggits.evaluation.common.mapper.EvalFileMapper;
@@ -234,7 +236,7 @@ public class EvalMngContoller {
 		String shtInfoId = evalMngService.saveEvalShtInfo(evalShtInfo,requestForProposalFileList,attachmentFileList,presentationFileList);
 		resultMap.put("shtInfoId", shtInfoId);
 		
-		return CommonResponse.successToData(resultMap, "정상적으로 입력 되었습니다.");
+		return CommonResponse.successToData(resultMap, "정상적으로 입력되었습니다.");
 	}
 	
 	/**
@@ -275,7 +277,7 @@ public class EvalMngContoller {
 		String shtInfoId = evalMngService.updateEvalShtInfo(evalShtInfo,requestForProposalFileList,attachmentFileList,presentationFileList);
 		resultMap.put("shtInfoId", shtInfoId);
 		
-		return CommonResponse.successToData(resultMap, "정상적으로 입력 되었습니다.");
+		return CommonResponse.successToData(resultMap, "정상적으로 입력되었습니다.");
 	}
 	
 	/**
@@ -319,6 +321,22 @@ public class EvalMngContoller {
 		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK , "평가지 정보가 복사되었습니다.");
 	}
 	
+	@GetMapping("/{shtInfoId}/status/update.ajax")
+	public @ResponseBody CommonResponse<?> evalInfoStatusUpdate(@PathVariable(value = "shtInfoId", required = true) String shtInfoId,
+																@RequestParam(value = "sttsType", required = true) String sttsType){
+		try {
+			EvalShtInfo evalShtInfo = evalShtInfoMapper.findOneByShtInfoId(shtInfoId);
+			String evalSttsCd = EvalSttsCd.EVAL_SCORE_GRADING.getCode(); // 기본값 채점 진행중
+			if("cmplt".equals(sttsType)) evalSttsCd = EvalSttsCd.EVAL_SOCRE_COMPLETE.getCode();
+			evalShtInfo.setShtAllStts(evalSttsCd);
+			evalShtInfoMapper.updateShtAllSttsByshtInfoId(evalShtInfo);
+		} catch (CommonException ce) {
+			return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST , ce.getMessage());
+		}
+		
+		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK , "평가지 상태 값이 변경되었습니다.");
+	}
+	
 	/**
 	 * @Method Name : accssCodeChange
 	 * @작성일 : 2023. 10. 19.
@@ -331,7 +349,7 @@ public class EvalMngContoller {
 	public @ResponseBody CommonResponse<?> accssCodeChange(@PathVariable(value = "shtInfoId", required = true) String shtInfoId){
 		
 		evalMngService.updateAccssCode(shtInfoId);
-		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK , "참여코드가 수정 되었습니다.");
+		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK , "참여 코드가 수정되었습니다.");
 	}
 	
 	/**
@@ -374,7 +392,7 @@ public class EvalMngContoller {
 		
 		resultMap.put("shtInfoId", shtInfoId);
 		
-		return CommonResponse.successToData(resultMap, "정상적으로 입력 되었습니다.");
+		return CommonResponse.successToData(resultMap, "정상적으로 입력되었습니다.");
 	}
 	
 	/**
@@ -390,7 +408,7 @@ public class EvalMngContoller {
 			
 			) {
 		
-		return CommonResponse.successToData(null, "정상적으로 입력 되었습니다.");
+		return CommonResponse.successToData(null, "정상적으로 입력되었습니다.");
 	}
 	
 	/**
@@ -414,7 +432,7 @@ public class EvalMngContoller {
 		
 		resultMap.put("shtInfoId", shtInfoId);
 		
-		return CommonResponse.successToData(resultMap, "정상적으로 입력 되었습니다.");
+		return CommonResponse.successToData(resultMap, "정상적으로 입력되었습니다.");
 	}
 	
 	/**
@@ -431,8 +449,8 @@ public class EvalMngContoller {
 			type = "save";
 		}
 		//평가지 타입 체크(존재하지 않으면 : BOTH_EMPTY, 정량적 평가지 존재하면 : QLT_EMPTY(정상적 비어있음), 정상적 평가지 존재하면 : QNT_EMPTY(정량적 비어있음), 앞 조건에 해당하지않으면 :BOTH_EXIST)
-		String shtExistCheck = evalShtMapper.findOneShtExistCheck(shtInfoId);
-		
+		Map<String,Object> shtExistCheckMap = evalShtMapper.findOneShtExistCheck(shtInfoId);
+		String shtExistCheck = GgitsCommonUtils.isNull(shtExistCheckMap.get("shtExistCheck")) ? "BOTH_EMPTY" : (String) shtExistCheckMap.get("shtExistCheck");
 		//조건에 해당하지 않으면 목록으로
 		if("save".equals(type) &&"BOTH_EXIST".equals(shtExistCheck)) {
 			return "redirect:/evaluation/management/list.do";
@@ -467,14 +485,14 @@ public class EvalMngContoller {
 	}
 	
 	/**
-	 * @Method Name : getEvalQnt
+	 * @Method Name : getEvalMngDetailInfo
 	 * @작성일 : 2023. 10. 06.
 	 * @작성자 : IK.MOON
 	 * @Method 설명 : 정량적 평가지 작성 화면
 	 * @return
 	 */
 	@GetMapping("/detailinfo/{shtInfoId}/detail.do")
-	public String getEvalMngDetailInfo(@PathVariable String shtInfoId,@RequestParam(name = "shtAllStts" ,required = true) String shtAllStts, Model model) {
+	public String getEvalMngDetailInfo(@PathVariable String shtInfoId, Model model) {
 		EvalShtInfo evalShtInfo = evalShtInfoMapper.findOneByShtInfoId(shtInfoId); 
 		
 		if(evalShtInfo == null) {
@@ -501,7 +519,7 @@ public class EvalMngContoller {
 		model.addAttribute("requestFileList", requestFileList);
 		model.addAttribute("attachmentFileList", attachmentFileList);
 		model.addAttribute("presentationFileList", presentationFileList);
-		model.addAttribute("shtAllStts", shtAllStts);
+		model.addAttribute("shtAllStts", evalShtInfo.getShtAllStts());
 		model.addAttribute("evalShtInfo", evalShtInfo);
 		model.addAttribute("rtrTotalCnt", rtrTotalCnt);
 		
@@ -521,17 +539,86 @@ public class EvalMngContoller {
 		if(GgitsCommonUtils.isNull(shtType)) {
 			shtType = "all";
 		}
+		
 		EvalResultDTO evalResultInfo = evalMngService.findAllEvalResultInfo(shtInfoId,shtType);
 		
-		List<EvalFile> fileTest = evalFileMapper.findAllByShtInfoId(shtInfoId);
 		model.addAttribute("evalResultInfo",evalResultInfo);
 		model.addAttribute("shtInfoId",shtInfoId);
 		model.addAttribute("shtType",shtType);
-		if(fileTest.size() > 0) {
-			model.addAttribute("fileTest",fileTest.get(1));
-		}
 		
+		if (shtType.equals("qlt")) {
+			return "view/evalMng/evalMngResultQlt";
+		} else if (shtType.equals("qnt")) {
+			// 평가지 문항, 배점 정보
+			EvalShtInfoDTO evalShtInfoDTO = evalMngService.findAllEvalScrInfo(shtInfoId, shtType);
+			
+			// 평가자 정보
+			List<EvalRtr> raterList = evalRtrMapper.findAllRtrByShtInfoId(shtInfoId);
+			String rtrId = raterList.get(0).getRtrId();
+			
+			// 평가 점수 정보
+			List<EvalRtrItemScr> evalRtrSctrScrs = raterService.findAllRtrItemScrJoinRtrShtAndEvalShtByRtrIdAndShtInfoId(shtInfoId, rtrId, "qnt");
+			
+			
+			model.addAttribute("evalShtInfoDTO", evalShtInfoDTO);
+			model.addAttribute("evalRtrSctrScrs", evalRtrSctrScrs);
+			return "view/evalMng/evalMngResultQnt";
+		}
 		return "view/evalMng/evalMngResult";
+	}
+	
+	/**
+	 * @Method Name : evalIndvRsult
+	 * @작성일 : 2023. 10. 06.
+	 * @작성자 : NK.KIM
+	 * @Method 설명 : 평가 결과 화면
+	 * @return
+	 */
+	@GetMapping("/{shtInfoId}/indv/result.do")
+	public String evalIndvRsult(@PathVariable String shtInfoId, Model model,
+			@RequestParam(name = "rtrId" ,required = false) String rtrId,
+			@RequestParam(name = "bddCmpId" ,required = false) String bddCmpId,
+			EvalRtr evalRtr, EvalBddCmp evalBddCmp
+			) {
+		EvalShtInfo evalShtInfo = evalShtInfoMapper.findOneByShtInfoId(shtInfoId);
+		// 평가자 정보
+		List<EvalRtr> raterList = evalRtrMapper.findAllRtrByShtInfoId(shtInfoId);
+		if(GgitsCommonUtils.isNull(rtrId)) {
+			rtrId = raterList.get(0).getRtrId();
+		} 
+		
+		// 기업 정보
+		List<EvalBddCmp> bddCmpList = evalBddCmpMapper.findAllByShtInfoId(shtInfoId);
+		
+		//평가자 정보 조회
+		Map<String,Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("shtInfoId", shtInfoId);
+		paramMap.put("rtrId", rtrId);
+		
+		List<EvalResultRtrInfo> evalResultRtrInfoList = evalShtMapper.findAllRsultRtrScrInfoByShtInfoIdAndShtIdAndRtrId(paramMap);
+		
+		//평가지 정보
+		EvalShtInfoDTO evalShtInfoDTO = evalMngService.findAllEvalScrInfo(shtInfoId, "qlt");
+		
+		// 평가자 평가 점수
+		List<EvalRtrItemScr> evalRtrSctrScrs = raterService.findAllRtrItemScrJoinRtrShtAndEvalShtByRtrIdAndShtInfoId(shtInfoId, rtrId, "qlt");
+		
+		model.addAttribute("rtrId", rtrId);
+		model.addAttribute("rtrAgncy", evalRtrMapper.findOneRtrAgncyByRtrId(rtrId));
+		model.addAttribute("signFileId", evalRtrShtMapper.findOneFileId(shtInfoId, rtrId));
+		
+		model.addAttribute("evalShtInfoDTO", evalShtInfoDTO);
+		model.addAttribute("evalRtrSctrScrs", evalRtrSctrScrs);
+		
+		
+		model.addAttribute("bddCmpId", bddCmpId);
+		model.addAttribute("shtInfoId", shtInfoId);
+		model.addAttribute("raterList", raterList);
+		model.addAttribute("bddCmpList", bddCmpList);
+		model.addAttribute("evalShtInfo", evalShtInfo);
+		model.addAttribute("evalResultRtrInfoList", evalResultRtrInfoList);
+		
+		return "view/evalMng/evalMngIndvResult";
 	}
 	
 	/**
@@ -617,8 +704,6 @@ public class EvalMngContoller {
 															@RequestBody List<EvalRtrList> evalRtrList
 														) {
 		
-		Map<String,Object> resultMap = new HashMap<String, Object>();
-
 		if(evalRtrList.size() == 0) {
 			return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST, "평가자가 한 명도 선택되지 않았습니다.");
 		} else if(evalRtrList.size() < 3) {
@@ -629,33 +714,7 @@ public class EvalMngContoller {
 		
 		evalMngService.saveRtrList(evalRtrList);
 		
-		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "평가 대상자 정보가 저장 되었습니다.");
-	}
-	
-	/**
-	  * @Method Name : evalCmpSaveAjax
-	  * @작성일 : 2023. 10. 20.
-	  * @작성자 : NK.KIM
-	  * @Method 설명 : 팝업 평가자 목록 저장
-	  * @param evalBddCmpList
-	  * @return
-	  */
-	@GetMapping("/rtr/list.do")
-	public String getRaterList() {
-		return "view/evalMng/raterList";
-	}
-	
-	/**
-	 * @Method Name : evalCmpSaveAjax
-	 * @작성일 : 2023. 10. 20.
-	 * @작성자 : NK.KIM
-	 * @Method 설명 : 팝업 평가자 목록 저장
-	 * @param evalBddCmpList
-	 * @return
-	 */
-	@GetMapping("/rtr/save.do")
-	public String raterSave() {
-		return "view/evalMng/raterAdd";
+		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "평가 대상자 정보가 저장되었습니다.");
 	}
 	
 	/**
@@ -687,14 +746,26 @@ public class EvalMngContoller {
 	  */
 	@PostMapping("/rater/save.ajax")
 	public @ResponseBody CommonResponse<?> raterSave(EvalRtr evalRtr) {
+		
+		ValidateBuilder dtoValidator = new ValidateBuilder(evalRtr);
+		dtoValidator.addRule("rtrNm", new ValidateChecker().setRequired())
+					.addRule("rtrBrthDt", new ValidateChecker().setRequired().setDate("날짜 입력값이 올바르지 않습니다."))
+					.addRule("rtrAgncy", new ValidateChecker().setRequired())
+					.addRule("rtrTel", new ValidateChecker().setRequired().setPhone())
+					;
+		
+		ValidateResult dtoValidatorResult = dtoValidator.isValid();
+		
+		if(!dtoValidatorResult.isSuccess()) {
+			return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST , dtoValidatorResult.getMessage());
+		}
+		
 		try {
-			
-			//TODO::유효성 검사
 			String rtrId = GgitsCommonUtils.getUuid();
 			evalRtr.setRtrId(rtrId);
 			int dupleChk = evalRtrMapper.findOneEvalRtrDuplChk(evalRtr); 
 			if(dupleChk > 0 ) {
-				return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST , "중복된 평가자 정보가 존재합니다. 평가자 정보를 확인해주세요.");
+				return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST , "중복된 평가자 정보가 존재합니다. 평가자 정보를 확인해 주세요.");
 			}
 			evalRtrMapper.save(evalRtr);
 		} catch (CommonException ce) {
@@ -706,13 +777,26 @@ public class EvalMngContoller {
 	
 	@GetMapping("/rater/{rtrId}/update.ajax")
 	public @ResponseBody CommonResponse<?> raterUpdate(@PathVariable(value = "rtrId", required = true) String rtrId,EvalRtr evalRtr) {
+		
+		ValidateBuilder dtoValidator = new ValidateBuilder(evalRtr);
+		dtoValidator.addRule("rtrId", new ValidateChecker().setRequired())
+					.addRule("rtrNm", new ValidateChecker().setRequired())
+					.addRule("rtrBrthDt", new ValidateChecker().setRequired().setDate("날짜 입력값이 올바르지 않습니다."))
+					.addRule("rtrAgncy", new ValidateChecker().setRequired())
+					.addRule("rtrTel", new ValidateChecker().setRequired().setPhone())
+					;
+		
+		ValidateResult dtoValidatorResult = dtoValidator.isValid();
+		
+		if(!dtoValidatorResult.isSuccess()) {
+			return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST , dtoValidatorResult.getMessage());
+		}
+		
 		try {
-			
-			//TODO::유효성 검사
 			evalRtr.setRtrId(rtrId);
 			int dupleChk = evalRtrMapper.findOneEvalRtrDuplChk(evalRtr); 
 			if(dupleChk > 0 ) {
-				return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST , "중복된 평가자 정보가 존재합니다. 평가자 정보를 확인해주세요.");
+				return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST , "중복된 평가자 정보가 존재합니다. 평가자 정보를 확인해 주세요.");
 			}
 			evalRtrMapper.update(evalRtr);
 		} catch (CommonException ce) {
@@ -752,9 +836,7 @@ public class EvalMngContoller {
 			@RequestParam(name = "shtInfoId", required = true) String shtInfoId,
 			@RequestParam(name = "shtNm", required = true) String shtNm
 			) {
-
-//		String shtInfoId = ((EvalShtInfo) session.getAttribute("shtInfoSession")).getShtInfoId();
-//		String rtrId = ((EvalRtr) session.getAttribute("rtrInfoSession")).getRtrId();
+		
 		List<Map<String,Object>> evalRtrList = evalRtrListMapper.findAllByShtInfoId(shtInfoId);
 		String rtrId = (String) evalRtrList.get(0).get("rtrId");
 		
@@ -767,9 +849,10 @@ public class EvalMngContoller {
 		int offset = (pageNo - 1) * pageSize;
 		evalShtInfo.setPageNo(offset);
 
+	
 		List<EvalBddCmpEvalListDto> evalBddCmpList = raterService.findAllBddCmpByShtInfoIdOrderByCmpNbr(evalShtInfo,
 				rtrId, shtType);
-
+		
 		int totalCnt = raterService.countAllEvalShtInfoList(shtInfoId);
 
 		Paging paging = new Paging();
@@ -783,6 +866,7 @@ public class EvalMngContoller {
 		model.addAttribute("paging", paging);
 		model.addAttribute("shtInfoId", shtInfoId);
 		model.addAttribute("shtNm", shtNm);
+		model.addAttribute("qntMaxScr", evalShtMapper.findOneMaxQntScrByShtInfoId(shtInfoId));
 
 		session.setAttribute("shtInfoSession", evalShtInfo);
 		
@@ -798,7 +882,6 @@ public class EvalMngContoller {
 	 */
 	@GetMapping("/admin/{shtInfoId}/save.do")
 	public String getEvalSht(@PathVariable(value = "shtInfoId", required = true) String shtInfoId,
-//			@RequestParam(value = "bddCmpNm",required = true) String bddCmpNm,
 			EvalBddCmp evalBddCmp,
 							Model model, HttpSession session) {
 
@@ -806,6 +889,7 @@ public class EvalMngContoller {
 		// 평가지 정보
 		EvalShtInfoDTO evalShtInfoDTO = evalMngService.findAllEvalScrInfo(shtInfoId, "qnt");
 		
+		evalShtInfoDTO.setSaveType("save");
 		int totalScr = 0;
 		int totalScrCount = 0;
 		
@@ -821,7 +905,6 @@ public class EvalMngContoller {
 		model.addAttribute("totalScrCount", totalScrCount);
 		
 		// 정량적 평가지
-//		model.addAttribute("bddCmpNm", bddCmpNm);
 		model.addAttribute("evalBddCmp", evalBddCmp);
 		model.addAttribute("evalQntInfo", evalShtInfoDTO);
 		return "view/evalMng/evaluationQntSave";
@@ -859,40 +942,32 @@ public class EvalMngContoller {
 		// 모든 평가자 리스트
 		List<Map<String,Object>> evalRtrList = evalRtrListMapper.findAllByShtInfoId(shtInfoId);
 		
-		// 모든 평가기업 리스트
-//		List<EvalBddCmpEvalListDto> evalBddCmpList = new ArrayList<>();
-//		for(Map<String,Object> evalRtr : evalRtrList) {
-//			evalBddCmpList = raterService.findAllBddCmpByShtInfoIdOrderByCmpNbr(evalShtInfo,
-//					(String)evalRtr.get("rtrId"), "qnt");
-//		}
-		
-		// 모든 평가지
-		
+		// 모든 평가지 리스트
 		List<EvalRtrSht> evalRtrShtList = evalRtrShtMapper.findAllJoinEvalShtByShtTypeAndBddCmpIdAndShtInfoId("qnt", bddCmpId, shtInfoId);
-		
-		// TODO :: 평가 기업에 해당하는 rtrShtId 가져오기
 		
 		String saveType = evalRaterScrDTO.getSaveType();
 
+		// 저장할 평가 점수
 		List<EvalRtrItemScr> evalRtrItemScrs  = evalRaterScrDTO.getEvalRtrItemScrList();
+		
 		// 점수 저장 및 평가지 상태 코드 변경
 		if (saveType.equals("update")) {
-
-			// 점수 저장
-			for(EvalRtrSht evalRtrSht : evalRtrShtList) {
-				String rtrShtId = evalRtrSht.getRtrShtId();
-				for(int i = 0; i < evalRtrItemScrs.size(); i++) {
-					evalRtrItemScrs.get(i).setRtrShtId(rtrShtId);
-				}
-				raterService.updateRtrScr(evalRtrItemScrs);
-			}
-			
-			// 평가 상태 코드 변경
-			for(Map<String,Object> evalRtr : evalRtrList) {
-				raterService.updateAllStts(shtInfoId, (String)evalRtr.get("rtrId"));
-			}
-			session.removeAttribute("shtInfoSession");
-			return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "평가가 완료 되었습니다.");
+//
+//			// 점수 저장
+//			for(EvalRtrSht evalRtrSht : evalRtrShtList) {
+//				String rtrShtId = evalRtrSht.getRtrShtId();
+//				for(int i = 0; i < evalRtrItemScrs.size(); i++) {
+//					evalRtrItemScrs.get(i).setRtrShtId(rtrShtId);
+//				}
+//				raterService.updateRtrScr(evalRtrItemScrs);
+//			}
+//			
+//			// 평가 상태 코드 변경
+//			for(Map<String,Object> evalRtr : evalRtrList) {
+//				raterService.updateAllStts(shtInfoId, (String)evalRtr.get("rtrId"));
+//			}
+//			session.removeAttribute("shtInfoSession");
+//			return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "평가가 완료되었습니다.");
 
 		} else if (saveType.equals("save")) {
 				
@@ -911,25 +986,24 @@ public class EvalMngContoller {
 			}
 			
 			session.removeAttribute("shtInfoSession");
-			return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "평가가 완료 되었습니다.");
-			// TODO :: resultMap 리턴, 평가자 본인의 모든 평가가 완료 되었다면 -> 로그아웃
+			return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "평가가 완료되었습니다.");
 
 		} else if (saveType.equals("tmp")) {
-			// 점수 저장
-			for(EvalRtrSht evalRtrSht : evalRtrShtList) {
-				String rtrShtId = evalRtrSht.getRtrShtId();
-				for(int i = 0; i < evalRtrItemScrs.size(); i++) {
-					evalRtrItemScrs.get(i).setRtrShtId(rtrShtId);
-				}
-				raterService.saveRtrScrTmp(evalRtrItemScrs);
-			}
-			
-			// 평가 상태 코드 변경
-			for(Map<String,Object> evalRtr : evalRtrList) {
-				raterService.updateAllStts(shtInfoId, (String)evalRtr.get("rtrId"));
-			}
-			
-			return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "임시 저장되었습니다.");
+//			// 점수 저장
+//			for(EvalRtrSht evalRtrSht : evalRtrShtList) {
+//				String rtrShtId = evalRtrSht.getRtrShtId();
+//				for(int i = 0; i < evalRtrItemScrs.size(); i++) {
+//					evalRtrItemScrs.get(i).setRtrShtId(rtrShtId);
+//				}
+//				raterService.saveRtrScrTmp(evalRtrItemScrs);
+//			}
+//			
+//			// 평가 상태 코드 변경
+//			for(Map<String,Object> evalRtr : evalRtrList) {
+//				raterService.updateAllStts(shtInfoId, (String)evalRtr.get("rtrId"));
+//			}
+//			
+//			return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "임시 저장되었습니다.");
 		}
 
 		return CommonResponse.ResponseCodeAndMessage(HttpStatus.BAD_REQUEST, "잘못된 접근 입니다.");

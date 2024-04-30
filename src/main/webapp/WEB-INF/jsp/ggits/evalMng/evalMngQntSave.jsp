@@ -1,11 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <div class="content">
 	<input type="hidden" id="shtInfoId" value="${evalQntInfo.shtInfoId}" />
 	<input type="hidden" id="shtId" value="${evalQntInfo.shtId}" />
 	<div class="login_wrap">
-			<button type="button" onclick="logout()">
+			<button type="button" onclick="logout('admin')">
 				<img src="${pageContext.request.contextPath}/statics/images/logout.png">
 					로그아웃
 			</button>
@@ -13,18 +14,18 @@
 	<div class="content-head">
 		<img src="${pageContext.request.contextPath}/statics/images/logo.png"
 			class="logo">
-		<h1>평가지 작성(정량적)</h1>
+		<h1>정량적 평가 작성</h1>
 
 		<div class="progressbar-wrapper">
 			<ul class="progressbar">
 				<li class="progress-complete">
-					<p>평가정보 입력</p>
+					<p>제안평가<br> 정보 입력</p>
 				</li>
 				<li class="progress-complete">
-					<p>평가대상 등록</p>
+					<p>제안평가<br> 대상 등록</p>
 				</li>
 				<li class="progress-complete">
-					<p>평가유형 선택</p>
+					<p>평가 유형 선택</p>
 				</li>
 				<li class="active">
 					<p>평가지 작성</p>
@@ -33,32 +34,23 @@
 					<p>평가지 상세정보</p>
 				</li>
 				<li>
-					<p>평가결과 확인</p>
+					<p>평가 결과 확인</p>
 				</li>
 			</ul>
 		</div>
 	</div>
 	<div class="test-info form wdat">
 		<dl class="mj0">
-			<dt>- 정량적 평가서명 :</dt>
+			<dt>- 제안평가명 :</dt>
 			<dd>${shtNm}</dd>
 		</dl>
 	</div>
 
-
 	<div class="table-exel-btn-wrap">
-		<div>
+		<div class="test-remain">
 			평가 문항수
-			<span id="totalCnt">
-				<c:choose>
-					<c:when test="${fn:length(evalQntInfo.evalShtSctrList) > 0}">
-						(${fn:length(evalQntInfo.evalShtSctrList)})
-					</c:when>
-					<c:otherwise>
-						(1)
-					</c:otherwise>
-				</c:choose>
-			</span>
+			<span id="totalCnt"></span>
+			<span id="totalScr">0점</span>
 		</div>
 		<div class="btn-sub-wrap">
 			<a href="${pageContext.request.contextPath}/common/sample/file/download.ajax?fileName=sample_qnt_upload.csv" class="mini-btn mini-sub-btn">양식 다운로드</a>
@@ -84,7 +76,9 @@
 						<c:set var="height" value="${133 * itemLength}px" />
 						<c:set var="lineHeight" value="${133 * itemLength}px" />
 						<div class="table-list sub-head" style="height: ${height}; line-height: ${lineHeight};">
-							<img src="/statics/images/table-plus.png" class="table-plus" onclick="fnAddToggle(${evalShtSctrList.fldOrdr});">
+							<button type="button" class="table-plus" onclick="fnAddToggle(${evalShtSctrList.fldOrdr});">
+								<img src="/statics/images/table_plus.png" class="table-plus-icon">문항추가
+							</button>
 							<div class="table-btn-wrap" style="display: none;">
 								<ul>
 									<li>
@@ -95,19 +89,20 @@
 									</li>
 								</ul>
 							</div>
-							<textarea name="fldSctr" maxlength="255" placeholder="내용을 입력해주세요." data-shtsctrid="${evalShtSctrList.shtSctrId}">${evalShtSctrList.fldSctr}</textarea>
+							<textarea name="fldSctr" maxlength="255" placeholder="내용을 입력해 주세요." data-shtsctrid="${evalShtSctrList.shtSctrId}">${evalShtSctrList.fldSctr}</textarea>
 						</div>
 						<div class="table-list sub-body">
 							<c:forEach var="evalShtItemList" items="${evalShtSctrList.evalShtItemList}">
 								<div class="table-sub-list table-qnt-sub-list">
 									<div class="addFldItmUl changUl">
-										<textarea name="fldItm" maxlength="255" placeholder="내용을 입력해주세요." data-shtitmid="${evalShtItemList.shtItmId}">${evalShtItemList.itmNm}</textarea>
+										<textarea name="fldItm" maxlength="255" placeholder="내용을 입력해 주세요." data-shtitmid="${evalShtItemList.shtItmId}">${evalShtItemList.itmNm}</textarea>
 									</div>
 									<div class="addFldElmntUl changUl">
-										<textarea name="fldElmnt" maxlength="255" placeholder="내용을 입력해주세요.">${evalShtItemList.itmElmnt}</textarea>
+										<textarea name="fldElmnt" maxlength="255" placeholder="내용을 입력해 주세요.">${evalShtItemList.itmElmnt}</textarea>
 									</div>
 									<div>
-										<input type="text" class="evalShtQntScrInfo" name="fldScr" placeholder="ex) 10" maxlength="2" value="${evalShtItemList.evalShtQntScrInfo.fldScr}" data-qntscrid="${evalShtItemList.evalShtQntScrInfo.qntScrId}" onkeyup="isScrValidated(this)">
+										<fmt:parseNumber var="intScr" value="${evalShtItemList.evalShtQntScrInfo.fldScr}" integerOnly="true"/>
+										<input type="text" class="evalShtQntScrInfo" name="fldScr" placeholder="ex) 10" maxlength="2" value="${intScr}" data-qntscrid="${evalShtItemList.evalShtQntScrInfo.qntScrId}" onkeyup="isScrValidated(this)">
 									</div>
 									<div class="addRemoveBtnUl changUl">
 										<img src="/statics/images/delete.png" class="close removeBtn" data-remove-order="${evalShtSctrList.fldOrdr}" data-remove-shtsctrid="${evalShtSctrList.shtSctrId}" data-remove-shtitmid="${evalShtItemList.shtItmId}" onclick="fnRemoveFldCctr(this,${evalShtItemList.itemOrdr})" />
@@ -121,7 +116,10 @@
 			<c:otherwise>
 				<div class="table-body pc-table-qnt-body">
 					<div class="table-list sub-head">
-						<img src="/statics/images/table-plus.png" class="table-plus"onclick="fnAddToggle(0);">
+<!-- 						<img src="/statics/images/table-plus.png" class="table-plus"onclick="fnAddToggle(0);"> -->
+						<button type="button" class="table-plus" onclick="fnAddToggle(0);">
+							<img src="/statics/images/table_plus.png" class="table-plus-icon">문항추가
+						</button>
 						<div class="table-btn-wrap" style="display: none;">
 							<ul>
 								<li>
@@ -132,17 +130,15 @@
 								</li>
 							</ul>
 						</div>
-						<div class="addFldSctrUl changUl">
-							<textarea name="fldSctr" maxlength="255" placeholder="내용을 입력해주세요." data-shtitmid=""></textarea>
-						</div>
+						<textarea name="fldSctr" maxlength="255" placeholder="내용을 입력해 주세요." data-shtitmid=""></textarea>
 					</div>
 					<div class="table-list sub-body">
 						<div class="table-sub-list table-qnt-sub-list">
 							<div class="addFldItmUl changUl">
-								<textarea name="fldItm" maxlength="255" placeholder="내용을 입력해주세요." data-shtitmid=""></textarea>
+								<textarea name="fldItm" maxlength="255" placeholder="내용을 입력해 주세요." data-shtitmid=""></textarea>
 							</div>
 							<div class="addFldElmntUl changUl text-length">
-								<textarea name="fldElmnt" maxlength="255" placeholder="내용을 입력해주세요."></textarea>
+								<textarea name="fldElmnt" maxlength="255" placeholder="내용을 입력해 주세요."></textarea>
 							</div>
 							<div>
 								<input type="text" class="evalShtQntScrInfo" name="fldScr" placeholder="ex) 10" maxlength="2" data-qntscrid="" onkeyup="isScrValidated(this)"> 
@@ -159,7 +155,8 @@
 	
 
 	<div class="footer-wrap">
-		<a href="javascript:history.back();" class="mini-btn mini-sub-btn prev">이전</a>
+<!-- 		<a href="javascript:history.back();" class="mini-btn mini-sub-btn prev">이전</a> -->
+		<a href="${pageContext.request.contextPath}/evaluation/management/type/${evalQntInfo.shtInfoId}/save.do?type=update" class="mini-btn mini-sub-btn prev">이전</a>
 		<div class="footer-left-btn">
 			<c:choose>
 				<c:when test="${evalQntInfo.saveType eq 'update'}">
@@ -176,10 +173,28 @@
 
 
 <script>
+	fnChangeTotalCnt();
+	fnSetTotalScr();
 	
 	var delShtSctrIdArray = new Array();
 	var delShtItmIdArray = new Array();
-
+	
+	// 평가 문항수 변경
+	function fnChangeTotalCnt() {
+		$("#totalCnt").text("("+$(".table-sub-list").length+")");
+	}
+	
+	// 최고점 합 계산
+	function fnSetTotalScr() {
+		var highestPoint = $(".evalShtQntScrInfo");
+		var totalScr = 0;
+		highestPoint.each(function(idx,item){
+			totalScr += Number($(item).val());
+			
+		})
+		$('#totalScr').text(totalScr+'점');
+	}
+	
 	function fnAddFldCctr(_this){
 		var sortNum = Number($(_this).data("sort"));
 		
@@ -206,24 +221,27 @@
 		
 		var html =	'<div class="table-body pc-table-qnt-body">'+
 						'<div class="table-list sub-head">'+
-							'<img src="/statics/images/table-plus.png" class="table-plus" onclick="fnAddToggle('+(sortNum+1)+');">'+
+//							'<img src="/statics/images/table-plus.png" class="table-plus" onclick="fnAddToggle('+(sortNum+1)+');">'+
+							'<button type="button" class="table-plus" onclick="fnAddToggle('+(sortNum+1)+');">'+
+								'<img src="/statics/images/table_plus.png" class="table-plus-icon">문항추가'+
+							'</button>'+
 			            	'<div class="table-btn-wrap" style="display: none;">'+
 								'<ul>'+
 									'<li><button type="button" class="addFldCctr" onclick="fnAddFldCctr(this)" data-sort="'+(sortNum+1)+'"><img src="${pageContext.request.contextPath}/statics/images/table-inner-plus.png" class="table-inner-plus">부문추가</button></li>'+
 									'<li><button type="button" class="addFldItm" onclick="fnAddFldItm(this)" data-fld-order="'+(sortNum+1)+'"><img src="${pageContext.request.contextPath}/statics/images/table-inner-plus.png" class="table-inner-plus">항목추가</button></li>'+
 								'</ul>'+
 							'</div>'+
-// 						 	'<input type="text" name="fldSctr" maxlength="255" placeholder="내용을 입력해주세요." data-shtsctrid=""">'+
-						 	'<textarea name="fldSctr" maxlength="255" placeholder="내용을 입력해주세요." data-shtitmid=""></textarea>'+
+// 						 	'<input type="text" name="fldSctr" maxlength="255" placeholder="내용을 입력해 주세요." data-shtsctrid=""">'+
+						 	'<textarea name="fldSctr" maxlength="255" placeholder="내용을 입력해 주세요." data-shtitmid=""></textarea>'+
 						'</div>'+
 						'<div class="table-list sub-body">'+
 							'<div class="table-sub-list table-qnt-sub-list">'+
 								'<div class="addFldItmUl changUl">'+
-// 									'<input type="text" name="fldItm" maxlength="255" placeholder="내용을 입력해주세요." data-shtitmid="">'+
-									'<textarea name="fldItm" maxlength="255" placeholder="내용을 입력해주세요." data-shtitmid=""></textarea>'+
+// 									'<input type="text" name="fldItm" maxlength="255" placeholder="내용을 입력해 주세요." data-shtitmid="">'+
+									'<textarea name="fldItm" maxlength="255" placeholder="내용을 입력해 주세요." data-shtitmid=""></textarea>'+
 								'</div>'+
 								'<div class="addFldElmntUl changUl">'+
-									'<textarea name="fldElmnt" maxlength="255" placeholder="내용을 입력해주세요."></textarea>'+
+									'<textarea name="fldElmnt" maxlength="255" placeholder="내용을 입력해 주세요."></textarea>'+
 								'</div>'+
 								'<div>'+
 								   	'<input type="text" class="evalShtQntScrInfo" name="fldScr" placeholder="ex) 10" maxlength="2" data-qntscrid="" onkeyup="isScrValidated(this)">'+
@@ -238,7 +256,8 @@
 			
 			$(".table-body").eq(sortNum).after(html);
 			fldSctrAreaHeight(selectPointType,(sortNum+1));
-			$("#totalCnt").text("("+(addFldCctr.length+1)+")")
+			// $("#totalCnt").text("("+(addFldCctr.length+1)+")")
+			fnChangeTotalCnt();
 			$('.table-btn-wrap').hide();
 		
 	}
@@ -258,10 +277,10 @@
 		//배점 html 추가
 		var html =		'<div class="table-sub-list table-qnt-sub-list">'+
 							'<div class="addFldItmUl changUl">'+
-								'<textarea name="fldItm" maxlength="255" placeholder="내용을 입력해주세요." data-shtitmid=""></textarea>'+
+								'<textarea name="fldItm" maxlength="255" placeholder="내용을 입력해 주세요." data-shtitmid=""></textarea>'+
 							'</div>'+
 							'<div class="addFldElmntUl changUl">'+
-								'<textarea name="fldElmnt" maxlength="255" placeholder="내용을 입력해주세요."></textarea>'+
+								'<textarea name="fldElmnt" maxlength="255" placeholder="내용을 입력해 주세요."></textarea>'+
 							'</div>'+
 							'<div>'+
 							   	'<input type="text" class="evalShtQntScrInfo" name="fldScr" placeholder="ex) 10" maxlength="2" data-qntscrid="" onkeyup="isScrValidated(this)">'+
@@ -274,6 +293,8 @@
 		subBody.eq(sortNum).append(html);
 		
 		fldSctrAreaHeight(selectPointType,sortNum);
+		
+		fnChangeTotalCnt();
 			
 		$('.table-btn-wrap').hide();
 	
@@ -284,51 +305,54 @@
 	}
 	
 	function fnRemoveFldCctr(_this,removeIdx){
-		var parentIdx = $(_this).data("remove-order");
-		
-		var tableBody = $(".table-body");
-		var tableSubList = tableBody.eq(parentIdx).find(".table-sub-list");
-		
-		
-		if(tableBody.length == 1 && tableSubList.length == 1){
-			alert("평가부문 행이 최소 하나 이상은 존재해야합니다.");
-			return;
-		}
-		
-		var removeShtSctrId = $(_this).data("remove-shtsctrid"); 
-		var removeShtItmId = $(_this).data("remove-shtitmid");
-		
-		if(tableSubList.length == 1){
-			if(removeShtSctrId != "" && removeShtSctrId != null){
-				delShtSctrIdArray.push(removeShtSctrId)
+		if(confirm('항목을 삭제하시겠습니까?')) {
+			var parentIdx = $(_this).data("remove-order");
+			
+			var tableBody = $(".table-body");
+			var tableSubList = tableBody.eq(parentIdx).find(".table-sub-list");
+			
+			
+			if(tableBody.length == 1 && tableSubList.length == 1){
+				alert("평가부문 행이 최소 하나 이상은 존재해야 합니다.");
+				return;
 			}
-			tableBody.eq(parentIdx).remove();
-		}else{
-			if(removeShtItmId != "" && removeShtItmId != null){
-				delShtItmIdArray.push(removeShtItmId);
+			
+			var removeShtSctrId = $(_this).data("remove-shtsctrid"); 
+			var removeShtItmId = $(_this).data("remove-shtitmid");
+			
+			if(tableSubList.length == 1){
+				if(removeShtSctrId != "" && removeShtSctrId != null){
+					delShtSctrIdArray.push(removeShtSctrId)
+				}
+				tableBody.eq(parentIdx).remove();
+			}else{
+				if(removeShtItmId != "" && removeShtItmId != null){
+					delShtItmIdArray.push(removeShtItmId);
+				}
+				tableSubList.eq(removeIdx).remove();
+				var selectPointType = $("#selectPointType").val();
+				fldSctrAreaHeight(selectPointType,parentIdx); 
 			}
-			tableSubList.eq(removeIdx).remove();
-			var selectPointType = $("#selectPointType").val();
-			fldSctrAreaHeight(selectPointType,parentIdx); 
+			
+			var addFldCctr = $(".addFldCctr");
+			var tablePlus = $(".table-plus");
+			var subBody = $(".sub-body");
+			var addFldItm = $(".addFldItm");
+			
+			addFldCctr.each(function(idx,item){
+				$(item).attr("data-sort",idx);
+				tablePlus.eq(idx).attr("onclick","fnAddToggle("+idx+")")
+				addFldItm.eq(idx).attr("data-fld-order",idx)
+				var removeBtn = subBody.eq(idx).find(".removeBtn");
+				removeBtn.attr("data-remove-order",idx)
+				removeBtn.each(function(removeIdx,removeItem){
+					$(removeItem).attr("onclick","fnRemoveFldCctr(this,"+removeIdx+")")	
+				})
+			});
+			
+			// $("#totalCnt").text("("+$(".table-body").length+")");
+			fnChangeTotalCnt();
 		}
-		
-		var addFldCctr = $(".addFldCctr");
-		var tablePlus = $(".table-plus");
-		var subBody = $(".sub-body");
-		var addFldItm = $(".addFldItm");
-		
-		addFldCctr.each(function(idx,item){
-			$(item).attr("data-sort",idx);
-			tablePlus.eq(idx).attr("onclick","fnAddToggle("+idx+")")
-			addFldItm.eq(idx).attr("data-fld-order",idx)
-			var removeBtn = subBody.eq(idx).find(".removeBtn");
-			removeBtn.attr("data-remove-order",idx)
-			removeBtn.each(function(removeIdx,removeItem){
-				$(removeItem).attr("onclick","fnRemoveFldCctr(this,"+removeIdx+")")	
-			})
-		});
-		
-		$("#totalCnt").text("("+$(".table-body").length+")");
 	}
 	
 	$("#selectPointType").on("change",function(){
@@ -376,7 +400,7 @@
 			var fldSctr = $(item).find("textarea[name='fldSctr']").val();
 			if(vaildChk){
 				if(fldSctr == null || fldSctr == ''){
-					alert((idx+1)+"번째 평가부문 내용을 입력해주세요.");
+					alert((idx+1)+"번째 평가부문 내용을 입력해 주세요.");
 					vaildChk = false;
 					return;
 				}
@@ -416,7 +440,7 @@
 					}
 				} else if (!isFldItmEmpty && vaildChk) {
 					if(itmNm == '') {
-						alert((idx+1)+"번째 평가부문의 "+(subIdx+1)+"번째 항목 내용을 입력해주세요.");
+						alert((idx+1)+"번째 평가부문의 "+(subIdx+1)+"번째 항목 내용을 입력해 주세요.");
 						vaildChk = false;
 						return;
 					}
@@ -430,7 +454,7 @@
 					}
 				} else if (!isFldItmEmntEmpty && vaildChk) {
 					if(itmElmnt == '') {
-						alert((idx+1)+"번째 평가부문의 "+(subIdx+1)+"번째 요소 내용을 입력해주세요.");
+						alert((idx+1)+"번째 평가부문의 "+(subIdx+1)+"번째 요소 내용을 입력해 주세요.");
 						vaildChk = false;
 						return;
 					}
@@ -456,7 +480,7 @@
 				}
 				if(vaildChk){
 					if(fldScr == null || fldScr == ''){
-						alert((idx+1)+"번째 평가부문의 "+(subIdx+1)+"번째 항목 배점을 입력해주세요.");
+						alert((idx+1)+"번째 평가부문의 "+(subIdx+1)+"번째 항목 배점을 입력해 주세요.");
 						vaildChk = false;
 						return;
 					}	
@@ -551,7 +575,7 @@
 	
 	$("#fileUpload").on("change",function(){
 		
-		if(confirm("기존에 등록한 정보는 삭제 됩니다. 업로드 진행하시겠습니가?")) {
+		if(confirm("기존에 등록한 정보는 삭제됩니다. 업로드를 진행하시겠습니까?")) {
 			var formData = new FormData();
 			var shtInfoId = $("#shtInfoId").val();
 			var shtId = $("#shtId").val();
@@ -586,6 +610,9 @@
 		var thisVal = $(_this).val();
 		var replaeVal = thisVal.replace(/[^0-9]/gi, '');		
 		$(_this).val(replaeVal);
+		
+		// 최고점 합
+		fnSetTotalScr();
 		
 	}
 	

@@ -71,7 +71,7 @@ public interface EvalShtMapper {
 	  * @param shtInfoId
 	  * @return
 	  */
-	public String findOneShtExistCheck(String shtInfoId);
+	public Map<String,Object> findOneShtExistCheck(String shtInfoId);
 	
 	/**
 	  * @Method Name : findOneByShtInfoIdAndShtType
@@ -92,6 +92,16 @@ public interface EvalShtMapper {
 	  * @return
 	  */
 	public EvalResultHeaderInfo findOneRsultHeaderInfoByShtInfoIdAndShtId(Map<String,Object> map);
+		
+		/**
+		 * @Method Name : findOneRsultHeaderInfoByShtInfoIdAndShtId
+		 * @작성일 : 2023. 10. 23.
+		 * @작성자 : NK.KIM
+		 * @Method 설명 : 평가지 결과 header (회사명 / 평균 / 합계 / 최고 / 최저 ) 정보 조회
+		 * @param Map<String,Object)
+		 * @return
+		 */
+		public EvalResultHeaderInfo findOneResultHeaderInfoByShtInfoIdAndShtType(Map<String,Object> map);
 
 	/**
 	  * @Method Name : findOneMaxMinRtrId
@@ -113,4 +123,44 @@ public interface EvalShtMapper {
 	  */
 	public List<EvalResultRtrInfo> findAllRsultRtrScrInfoByShtInfoIdAndShtId(Map<String,Object> map);
 	
-}
+	/**
+	 * @Method Name : findAllRsultRtrScrInfoByShtInfoIdAndShtIdAndRtrId
+	 * @작성일 : 2023. 10. 23.
+	 * @작성자 : NK.KIM
+	 * @Method 설명 : 평가지 결과 (평가자 / 점수)
+	 * @param Map<String,Object)
+	 * @return
+	 */
+	public List<EvalResultRtrInfo> findAllRsultRtrScrInfoByShtInfoIdAndShtIdAndRtrId(Map<String,Object> map);
+	
+	/**
+	  * @Method Name : findOneMaxQntScrByShtInfoId
+	  * @작성일 : 2023. 12. 14.
+	  * @작성자 : IK.MOON
+	  * @Method 설명 : 평가지 결과 (평가자 / 점수)
+	  * @param shtInfoId
+	  * @return
+	  */
+	public int findOneMaxQntScrByShtInfoId(String shtInfoId);
+	
+	/**
+	 * @Method Name : findOneMaxQltScrByShtInfoId
+	 * @작성일 : 2023. 12. 14.
+	 * @작성자 : IK.MOON
+	 * @Method 설명 : 평가지 결과 (평가자 / 점수)
+	 * @param shtInfoId
+	 * @return
+	 */
+	public int findOneMaxQltScrByShtInfoId(String shtInfoId);
+	
+	/**
+	 * @Method Name : findOneMaxQltScrByShtInfoId
+	 * @작성일 : 2024. 03. 17.
+	 * @작성자 : IK.MOON
+	 * @Method 설명 : 정량 / 정성 평가지 총점 결과
+	 * @param shtInfoId
+	 * @return
+	 */
+	public String findOneTotalScrByShtType(Map<String,Object> map);
+	
+ }

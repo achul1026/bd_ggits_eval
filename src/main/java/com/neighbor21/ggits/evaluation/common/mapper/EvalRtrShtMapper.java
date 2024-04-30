@@ -130,4 +130,30 @@ public interface EvalRtrShtMapper {
 	  * @param bddCmpId
 	  */
 	public void deleteByBddCmpId(String bddCmpId);
+	
+	/**
+	 * @Method Name : findOneJoinEvalShtByRtrIdAndBddCmpIdAndShtType
+	 * @작성일 : 2024. 01. 04.
+	 * @작성자 : IK.MOON
+	 * @Method 설명 : 평가지 조회
+	 * @param bddCmpId
+	 */
+	public EvalRtrSht findOneJoinEvalShtByRtrIdAndBddCmpIdAndShtTypeAndShtInfoId(@Param("rtrId") String rtrId, 
+																				@Param("bddCmpId") String bddCmpId, 
+																				@Param("shtType") String shtType, 
+																				@Param("shtInfoId") String shtInfoId);
+	
+	/**
+	  * @Method Name : findAllTotalScr
+	  * @작성일 : 2024. 01. 05.
+	  * @작성자 : IK.MOON
+	  * @Method 설명 : 평가자의 기업별 평가점수 토탈 조회
+	  * @param rtrId, shtInfoId, shtType
+	  */
+	public List<Map<String,Object>> findAllTotalScr(@Param("rtrId") String rtrId, 
+								@Param("shtInfoId") String shtInfoId, 
+								@Param("shtType")String shtType);
+	
+	public String findOneFileId(@Param("shtInfoId") String shtInfoId, @Param("rtrId") String rtrId);
+	
 }

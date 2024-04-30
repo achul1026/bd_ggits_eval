@@ -12,24 +12,12 @@ $(function () {
 		$(this).next().toggle();
 		$('.option').not(this).next().hide();
 	});
-	/*$('.file-one-change').on('change',function(){
-		var fileName = $(".file-one-change").val();
-		$(".file-one").val(fileName);
-	});
-	
-	$('.file-all-change').on('change',function(){
-		var fileName = $(".file-all-change").val();
-		$(".file-all").val(fileName);
-	});   */
 
-	$('.close').click(function () {
+	/*$('.close').click(function () {
 		$('.sign-wrap').hide();
 		$("html, body").removeClass("not_scroll");
-	});
-	/*$('.list-wrap').click(function(){
-		$('.sign-wrap').show();
-		$("html, body").addClass("not_scroll");
-	})*/
+	});*/
+
 	$('.name-sign-btn-on').click(function () {
 		$('.name-sign-wrap').show();
 		$("html, body").addClass("not_scroll");
@@ -42,6 +30,9 @@ $(function () {
 		$('.sign-wrap').show();
 		$("html, body").addClass("not_scroll");
 	});
+	
+	
+	
 	
 });
 
@@ -70,14 +61,16 @@ function modalPageMove(pageNo) {
 	$("input[name='modalPageNo']").val(pageNo);
 	var pageLocation = $("#pageLocation").val();
 	if (pageLocation == 'raterList') {
-		fnRaterList('', 'search');
+		fnRaterList('', 'search', 'list');
+	} else if(pageLocation == 'raterSave') {
+		fnRaterList('', 'search', 'save');
 	}
 }
 
-function fnRaterList(modalShtInfoId = "", callType = "") {
+function fnRaterList(modalShtInfoId = "", callType = "", requestType) {
 
 	var evalRtrInfo = new Object;
-
+	var url = '';
 	if (modalShtInfoId == "") {
 		modalShtInfoId = $("#modalShtInfoId").val();
 	}
@@ -86,18 +79,26 @@ function fnRaterList(modalShtInfoId = "", callType = "") {
 		evalRtrInfo.schRtrNm = $("#modalRaterNm").val();
 		evalRtrInfo.pageNo = $("#modalPageNo").val();
 	}
+	
+	if(requestType == 'list') {
+		url = "/common/modal/rater/list.do";
+	} else if(requestType == 'save') {
+		url = "/common/modal/rater/save/list.do";
+	}
+	
 	evalRtrInfo.shtInfoId = modalShtInfoId;
 
 	evalRtrInfo.rtrIdList = rtrIdList;
 	$.ajax({
 		type: "get",
-		url: __contextPath__ + "/common/modal/rater/list.do",
+		url: __contextPath__ + url,
 		data: evalRtrInfo,
 		dataType: "html",
 		success: function (html) {
 			$('.sign-content').remove()
 			$('.tester-list-wrap').append(html);
 			$('.tester-list-wrap').show();
+			$("html, body").addClass("not_scroll");
 
 			$("#modalShtInfoId").val('');
 			$("#modalShtInfoId").val(modalShtInfoId);
@@ -105,27 +106,11 @@ function fnRaterList(modalShtInfoId = "", callType = "") {
 	});
 }
 
-function fnSaveRaterList(modalShtInfoId = "", callType = "") {
-
-	$.ajax({
-		type: "get",
-		url: __contextPath__ + "/common/modal/rater/save/list.do",
-		dataType: "html",
-		success: function (html) {
-			$('.sign-content').remove()
-			$('.tester-list-wrap').append(html);
-			$('.tester-list-wrap').show();
-
-			$("#modalShtInfoId").val('');
-			$("#modalShtInfoId").val(modalShtInfoId);
-		}
-	});
-}
-
-function fnRaterListEnterKey(modalShtInfoId = "", callType = "") {
+function fnRaterListEnterKey(modalShtInfoId = "", callType = "", requestType) {
 	if (window.event.keyCode == 13) {
 		var evalRtrInfo = new Object;
-	
+		var url = "";
+		
 		if (modalShtInfoId == "") {
 			modalShtInfoId = $("#modalShtInfoId").val();
 		}
@@ -134,18 +119,26 @@ function fnRaterListEnterKey(modalShtInfoId = "", callType = "") {
 			evalRtrInfo.schRtrNm = $("#modalRaterNm").val();
 			evalRtrInfo.pageNo = $("#modalPageNo").val();
 		}
+		
+		if(requestType == 'list') {
+			url = "/common/modal/rater/list.do";
+		} else if(requestType == 'save') {
+			url = "/common/modal/rater/save/list.do";
+		}
+		
 		evalRtrInfo.shtInfoId = modalShtInfoId;
 	
 		evalRtrInfo.rtrIdList = rtrIdList;
 		$.ajax({
 			type: "get",
-			url: __contextPath__ + "/common/modal/rater/list.do",
+			url: __contextPath__ + url,
 			data: evalRtrInfo,
 			dataType: "html",
 			success: function (html) {
 				$('.sign-content').remove()
 				$('.tester-list-wrap').append(html);
 				$('.tester-list-wrap').show();
+				$("html, body").addClass("not_scroll");
 	
 				$("#modalShtInfoId").val('');
 				$("#modalShtInfoId").val(modalShtInfoId);
@@ -168,42 +161,42 @@ function fnEvalRaterList(shtInfoId) {
 			$('.sign-content').remove()
 			$('.tester-list-wrap').append(html);
 			$('.tester-list-wrap').show();
-
+			$("html, body").addClass("not_scroll");
 			//$("#modalShtInfoId").val('');
 			//$("#modalShtInfoId").val(modalShtInfoId);
 		}
 	});
 }
 
-function fnRaterMngList() {
-	$.ajax({
-		type: "get",
-		url: __contextPath__ + "/common/modal/raterMng/list.do",
-		// data: { "evalCmplt": evalCmplt, "shtInfoId": shtInfoId },
-		dataType: "html",
-		success: function (html) {
-			clearInterval(raterListTimer);
-			$('.sign-content').remove()
-			$('.tester-list-wrap').append(html);
-			$('.tester-list-wrap').show();
-		}
-	});
-}
+// function fnRaterMngList() {
+// 	$.ajax({
+// 		type: "get",
+// 		url: __contextPath__ + "/common/modal/raterMng/list.do",
+// 		// data: { "evalCmplt": evalCmplt, "shtInfoId": shtInfoId },
+// 		dataType: "html",
+// 		success: function (html) {
+// 			clearInterval(raterListTimer);
+// 			$('.sign-content').remove()
+// 			$('.tester-list-wrap').append(html);
+// 			$('.tester-list-wrap').show();
+// 		}
+// 	});
+// }
 
-function fnCmpSaveModal(shtInfoId) {
-	$.ajax({
-		type: "get",
-		url: __contextPath__ + "/common/modal/cmp/save.do",
-		dataType: "html",
-		success: function (html) {
-			clearInterval(raterListTimer);
-			$('.sign-content').remove()
-			$('.tester-list-wrap').append(html);
-			$('.tester-list-wrap').show();
-			$("#modalShtInfoId").val(shtInfoId);
-		}
-	});
-}
+// function fnCmpSaveModal(shtInfoId) {
+// 	$.ajax({
+// 		type: "get",
+// 		url: __contextPath__ + "/common/modal/cmp/save.do",
+// 		dataType: "html",
+// 		success: function (html) {
+// 			clearInterval(raterListTimer);
+// 			$('.sign-content').remove()
+// 			$('.tester-list-wrap').append(html);
+// 			$('.tester-list-wrap').show();
+// 			$("#modalShtInfoId").val(shtInfoId);
+// 		}
+// 	});
+// }
 
 function getDateFormatYYYYMMDDMISS(){
 	var today = new Date();
@@ -228,19 +221,11 @@ function showPdfViewerModal(fileId, fileOgnNm){
 		success : function(html) {
 			$('#pdfViewerModal').append(html);
 			$('#pdfViewer').show();
+			$("html, body").addClass("not_scroll");
 		}
 	});
 	
 }
-
-// function increaseFileCount(fileType) {
-// 	if(fileType == 'requestForProposal') {
-// 		rfpFileCount++;
-// 	}
-// 	if(fileType == 'attachment') {
-// 		attachmentFileCount++;
-// 	}
-// }
 
 var raterListTimer;
 
@@ -253,18 +238,18 @@ function fnRefreshRaterList(shtInfoId){
 function logout(user) {
 	let url;
 	if(user == 'admin') {
-		url = "admin";
+		url = "/login.do";
 	} else {
-		url = "rater";
+		url = "/main.do";
 	}
 	
 	if(confirm("로그아웃 하시겠습니까?")){
 		$.ajax({
 			type : "get",
-			url : __contextPath__+"/logout.ajax?user="+url,
+			url : __contextPath__+"/logout.ajax?user="+user,
 			success : function(result){
 				if(result.code == '200') {
-					location.href = "/main.do";
+					location.href = url;
 				} else {
 					alert(result.message);
 				}
@@ -272,3 +257,9 @@ function logout(user) {
 		});
 	}
 }
+
+function fnChckChildRadioBtn(_this) {
+	const childRadioBtn = _this.firstElementChild;
+	childRadioBtn.checked = true;
+}
+

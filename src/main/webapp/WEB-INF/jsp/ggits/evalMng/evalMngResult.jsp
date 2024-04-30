@@ -1,27 +1,27 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <div class="content result-content">
 	<div class="login_wrap">
-			<button type="button" onclick="logout()">
+			<button type="button" onclick="logout('admin')">
 				<img src="${pageContext.request.contextPath}/statics/images/logout.png">
 					로그아웃
 			</button>
 		</div>
 	<div class="content-head">
 			<img src="${pageContext.request.contextPath}/statics/images/logo.png" class="logo">
-			<h1>평가 결과 확인</h1>
+			<h1>제안평가 결과 확인</h1>
 	</div>
 	 <div class="progressbar-wrapper">
 	      <ul class="progressbar">
 	          <li class="progress-complete">
-	          	<p>평가정보 입력</p>
+	            <p>제안평가<br> 정보 입력</p>
 	          </li>
 	          <li class="progress-complete">
-	          	<p>평가대상 등록</p>
+	          	<p>제안평가<br> 대상 등록</p>
 	          </li>
 	          <li class="progress-complete">
-	          	<p>평가유형 선택</p>
+	          	<p>평가 유형 선택</p>
 	          </li>
 	          <li class="progress-complete">
 	          	<p>평가지 작성</p>
@@ -30,18 +30,18 @@
 	          	<p>평가지 상세정보</p>
 	          </li>
 	           <li class="active">
-	          	<p>평가결과 확인</p>
+	          	<p>평가 결과 확인</p>
 	          </li>
 	      </ul>
 	</div>		
 	
 		<div class="test-info form wdat flex gap32">
 			<dl class="mj0">
-				<dt>- 평가사업명 :</dt>
+				<dt>- 제안평가 사업명 :</dt>
 				<dd>${evalResultInfo.shtNm}</dd>
 			</dl>
 		</div>
-		<div class="btn-wrap pd0 flex-btn-wrap">
+		<div class="btn-wrap pd0 flex-btn-wrap print-type-btn">
 			<button type="button" class="on-btn mini-btn mj0 shtTypeBtn" onclick="fnEvalResult('all')">총 평가지</button>
 			<button type="button" class="mini-btn mini-sub-btn mj0 shtTypeBtn" onclick="fnEvalResult('qnt')">정량적 평가지</button>
 			<button type="button" class="mini-btn mini-sub-btn mj0 shtTypeBtn" onclick="fnEvalResult('qlt')">정성적 평가지</button>
@@ -49,6 +49,8 @@
 			
 		<c:set var="evalResultHeaderInfo" value="${evalResultInfo.evalResultHeaderInfo}" />
 		<c:set var="bddCmpNmLength" value="${fn:length(evalResultHeaderInfo.bddCmpNmList)}" />
+		<c:set var="cmpCount" value="0"/>
+		<c:set var="raterCount" value="0"/>
 		<div class="result-table info-table test-table wdat">
 			<table>
 	              <colgroup>
@@ -56,7 +58,7 @@
 					  <col width=""/>
 	              </colgroup>
 	              <tr>
-	                <th colspan="2" rowspan="2">평가위원</th>
+	                <th colspan="2" rowspan="2"></th>
 	                <th colspan="${bddCmpNmLength}">제안 업체</th>
 	                <th colspan="3" rowspan="2">비고</th>
 	              </tr>
@@ -65,56 +67,40 @@
 		             	<th>${bddCmpNmList}</th>
 	             	</c:forEach>
 	             </tr>
+	             
+<!-- 	              <tr> -->
+<!-- 	             	<td colspan="2">총계</td> -->
+<%-- 	             	<c:forEach var="totalSumList" items="${evalResultHeaderInfo.totalSumList}"> --%>
+<%-- 		             	<td>${totalSumList}</td> --%>
+<%-- 	             	</c:forEach> --%>
+<!-- 	             </tr> -->
+	             
 	             <tr>
-	             	<td colspan="2">평균</td>
-	             	<c:forEach var="totalAvgList" items="${evalResultHeaderInfo.totalAvgList}">
-		             	<td>${totalAvgList}</td>
-	             	</c:forEach>
-	             </tr>
-	              <tr>
 	             	<td colspan="2">총계</td>
-	             	<c:forEach var="totalSumList" items="${evalResultHeaderInfo.totalSumList}">
-		             	<td>${totalSumList}</td>
+	             	<c:set var="cmpCnt" value="0"/>
+	             	<c:forEach var="totalSumList" items="${evalResultHeaderInfo.totalSumList}" varStatus="count">
+	             		<td id="totalScr${count.index}"></td>
+		             	<c:set var="cmpCnt" value="${cmpCnt + 1}"/>
 	             	</c:forEach>
 	             </tr>
-	             <tr class="bg-f2">
-	             	<td rowspan="3">제외점수</td>
-	             	<td>소계</td>
-	             	<c:forEach var="bddCmpNmList" items="${evalResultHeaderInfo.bddCmpNmList}">
-		             	<td></td>
-	             	</c:forEach>
-	             </tr>
-	             <tr class="bg-f2">
-	             	<td>최고</td>
-	             	<c:forEach var="maxScrList" items="${evalResultHeaderInfo.maxScrList}">
-		             	<td>${maxScrList}</td>
-	             	</c:forEach>
-	             </tr>
-	             <tr class="bg-f2">
-	             	<td>최저</td>
-	             	<c:forEach var="minScrList" items="${evalResultHeaderInfo.minScrList}">
-		             	<td>${minScrList}</td>
+	             
+	             
+	             <tr>
+	             	<td colspan="2">정량적 평가</td>
+	             	<c:forEach var="qntTotalSumList" items="${evalResultHeaderInfo.qntTotalSumList}" varStatus="count">
+		             	<td id="qntScr${count.index}">${qntTotalSumList}</td>
 	             	</c:forEach>
 	             </tr>
 	             <tr>
-	                <td colspan="2">소계</td>
-	                <c:forEach var="bddCmpNmList" items="${evalResultHeaderInfo.bddCmpNmList}">
-		             	<td></td>
+	             	<td colspan="2">정성적 평가</td>
+	             	<c:forEach var="qltTotalSumList" items="${evalResultHeaderInfo.qltTotalSumList}" varStatus="count">
+		             	<td id="qltScr${count.index}">${qltTotalSumList}</td>
 	             	</c:forEach>
 	             </tr>
-	             <c:forEach var="evalResultRtrInfoList" items="${evalResultInfo.evalResultRtrInfoList}">
-	             <tr>
-	                <td colspan="2">${evalResultRtrInfoList.rtrNm}</td>
-	                <c:forEach var="sumSrc" items="${evalResultRtrInfoList.sumList}">
-		             	<td>${sumSrc}</td>
-	                </c:forEach>
-	             </tr>
-	             </c:forEach>
 	        </table>
 		</div>
 		<div class="table-about-text">
-			최상위와 최하위를 제외한 후 평균을 산정,
-  		    최상위와 최하위 평점이 2개 이상인 경우에는 1개씩만 제외
+			(정성적 평가) 최상위와 최하위를 제외한 후 평균 산정하며 최상위와 최하위 점수가 2개 이상인 경우에는 1개씩만을 제외
 		</div>
 		<div class="result-sign-wrap">
 			<div class="sign-today">
@@ -158,9 +144,8 @@
 		
 	
 		
-		<div class="btn-wrap pd0 flex-btn-wrap">
-			<!-- <a href="javascript:history.back();" class="mini-btn mini-sub-btn prev">이전</a> -->
-			<button type="button" id="listMoveBtn" class="on-btn mini-btn mj0" onclick="javascript:history.back();">확인</button>
+		<div class="btn-wrap pd0 flex-btn-wrap print-btn-none">
+			<button type="button" id="listMoveBtn" class="on-btn mini-btn mj0" onclick="location.href='${pageContext.request.contextPath}/evaluation/management/detailinfo/${shtInfoId}/detail.do?shtAllStts=ESC000';">확인</button>
 			<button type="button" id="printBtn" class="mini-btn mini-sub-btn">출력</button>
 		</div>
 </div>
@@ -185,7 +170,8 @@
 
 	var shtType = '${shtType}';
 	var shtInfoId = '${shtInfoId}';
-
+	const cmpCnt = ${cmpCnt};
+	const raterCountConst = ${raterCount};
 	
 	if("all" === shtType){
 		$(".shtTypeBtn").eq(1).removeClass("on-btn");
@@ -224,5 +210,23 @@
 		window.location.href = "${pageContext.request.contextPath}/evaluation/management/"+shtInfoId+"/result.do?shtType="+paramShtType;
 	}
 	
+	window.onbeforeprint = function () { 
+		$(".mini-sub-btn").addClass("display-none");
+	};
+
+	window.onafterprint = function () { 
+		$(".mini-sub-btn").removeClass("display-none");
+	};
 	
+	
+	(function() {
+		for(var i = 0; i < cmpCnt; i++) {
+			let qntScr = Number($("#qntScr"+i).text());
+			let qltScr = Number($("#qltScr"+i).text());
+			
+			let totalScr = (qntScr + qltScr).toFixed(2);
+			
+			$("#totalScr"+i).text(totalScr);
+		}
+	})();
 </script>

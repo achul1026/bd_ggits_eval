@@ -11,36 +11,34 @@
 	</div>
 	<div class="content-head">
 	     <img src="${pageContext.request.contextPath}/statics/images/logo.png" class="logo">
-			<h1>평가 화면</h1>
+			<h1>제안평가위원회 화면</h1>
 	</div>
 	
 	<div class="progressbar-wrapper progressbar-wrapper-tablet">
 	     <ul class="progressbar">
 	          <li class="progress-complete">
-	          	<p>평가자 정보 입력</p>
+	          	<p>제안평가<br>위원회 인증</p>
 	          </li>
 	          <li class="progress-complete">
-	          	<p>평가지 정보 확인</p>
+	          	<p>제안평가<br>정보 확인</p>
 	          </li>
 	           <li class="progress-complete">
-	          	<p>평가 목록</p>
+	          	<p>제안평가 목록</p>
 	          </li>
 	          <li class="active">
-	          	<p>평가 화면</p>
+	          	<p>제안평가위원회<br>점수 확인</p>
 	          </li>
-	          <li>
-	          	<p>평가점수 확인</p>
-	          </li>
+	        
 	      </ul>
 	</div>
 	
 	<div class="test-info">
 		<dl>
-			<dt>- 평가 대상 : </dt>
+			<dt>- 제안평가위원회 대상 : </dt>
 			<dd>${bddCmpNm}</dd>
 		</dl>
 		<dl>
-			<dt>- 평가 위원명 :</dt>
+			<dt>- 제안평가위원회 위원명 :</dt>
 			<dd>
 				<span>${rtrInfoSession.rtrNm}</span>
 				<c:if test="${signFileId ne null}">
@@ -141,7 +139,7 @@
 								<div class="addFldElmntUl changUl">${evalShtItemList.itmElmnt}</div>
 							</c:if>
 							<div class="addDirectNumberUl changUl" data-max-scr="${evalShtItemList.evalShtQntScrList[0].scr}">
-								${evalShtItemList.evalShtQntScrList[0].scr }점
+								${evalShtItemList.evalShtQntScrList[0].scr }
 							</div>
 							<div class="scoreDiv changUl table-list-text-center pd0">
 							<c:set var="shtItmId" value="${evalShtItemList.evalShtQntScrList[0].shtItmId}"/>
@@ -155,7 +153,7 @@
 														<c:if test="${shtItmId eq evalRtrSctrScr.shtItmId }">
 															<li>
 																<input type="radio" class="scr" name="scr${scrCount}" value="${evalShtQntScrList.scr}" ${evalShtQntScrList.scr eq evalRtrSctrScr.scr ? 'checked' : ''}><br>
-																<label>${evalShtQntScrList.scr}점</label>
+																<label>${evalShtQntScrList.scr}</label>
 															</li>
 														</c:if>
 												</c:forEach>
@@ -165,7 +163,7 @@
 											<c:forEach var="evalShtQntScrList" items="${evalShtItemList.evalShtQntScrList}">
 												<li>
 													<input type="radio" class="scr" name="scr${scrCount}" value="${evalShtQntScrList.scr}" ${evalShtQntScrList.scr eq 1 ? 'checked' : ''}><br>
-													<label>${evalShtQntScrList.scr}점</label>
+													<label>${evalShtQntScrList.scr}</label>
 												</li>
 											</c:forEach>
 										</c:otherwise>

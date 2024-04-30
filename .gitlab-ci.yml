@@ -18,8 +18,8 @@
 
 stages:          # List of stages for jobs, and their order of execution
   - build
-  - test
-  - deploy
+  #- test
+  #- deploy
 
 java-build:       # This job runs in the build stage, which runs first.
   stage: build
@@ -30,6 +30,9 @@ java-build:       # This job runs in the build stage, which runs first.
     - echo "Compiling the code..."
     - mvn clean package
     - echo "Compile complete."
+  #only:
+    #- main
+  
 
 # unit-test-job:   # This job runs in the test stage.
 #   stage: test    # It only starts when the job in the build stage completes successfully.
@@ -45,18 +48,21 @@ java-build:       # This job runs in the build stage, which runs first.
 #     - sleep 1
 #     - echo "No lint issues found."
 
-deploy-job:      # This job runs in the deploy stage.
-  variables:
-    GIT_STRATEGY: fetch
-    GIT_CLEAN_FLAGS: none
-  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
-  environment: production
-  script:
-    - echo "Deploying application..."
-    - cp /home/gitlab-runner/builds/h636sxd-a/0/bluedus_01/ggits_evaluation/target/*.war /home/bluedus/eval-tomcat9/ggits-eval-tomcat/webapps/ROOT.war
-    - sudo chown bluedus:bluedus /home/bluedus/eval-tomcat9/ggits-eval-tomcat/webapps/ROOT.war
-    - sudo su bluedus
-    - /home/bluedus/eval-tomcat9/ggits-eval-tomcat/bin/shutdown.sh
-    - /home/bluedus/eval-tomcat9/ggits-eval-tomcat/bin/startup.sh
-    #- sudo chown -R gitlab-runner:gitlab-runner /home/bluedus/eval-tomcat9/ggits-eval-tomcat/webapps/ROOT
-    - echo "Application successfully deployed."
+
+#deploy-job:      # This job runs in the deploy stage.
+  #variables:
+    #GIT_STRATEGY: fetch
+    #GIT_CLEAN_FLAGS: none
+  #stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+  #environment: production
+  #script:
+    #- echo "Deploying application..."
+    #- cp /home/gitlab-runner/builds/h636sxd-a/0/bluedus_01/ggits_evaluation/target/*.war /home/bluedus/eval-tomcat9/ggits-eval-tomcat/webapps/ROOT.war
+    #- sudo chown bluedus:bluedus /home/bluedus/eval-tomcat9/ggits-eval-tomcat/webapps/ROOT.war
+    #- sudo su bluedus
+    #- /home/bluedus/eval-tomcat9/ggits-eval-tomcat/bin/shutdown.sh
+    #- /home/bluedus/eval-tomcat9/ggits-eval-tomcat/bin/startup.sh
+    ##- sudo chown -R gitlab-runner:gitlab-runner /home/bluedus/eval-tomcat9/ggits-eval-tomcat/webapps/ROOT
+    #- echo "Application successfully deployed."
+  #only:
+    #- main

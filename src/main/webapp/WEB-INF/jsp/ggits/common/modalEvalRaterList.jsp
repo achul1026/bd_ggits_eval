@@ -5,7 +5,7 @@
 
 <div class="sign-content">
 	<div class="sign-head">
-		평가자 목록 
+		제안평가위원 목록 
 		<img src="${pageContext.request.contextPath}/statics/images/close-white.png" class="modal-close">
 	</div>
 	<div class="sign-body pd32">
@@ -13,10 +13,12 @@
 		<div class="tester-list mj0">
 			<div class="test-info mj0">
 				<dl class=" ">
-					<dt>- 평가인원 :</dt>
+					<dt>- 제안평가위원회 인원 :</dt>
 					<dd>${fn:length(evalRtrList)}명</dd>
 				</dl>
 			</div>
+			
+			<div class="update-text">※ 제안평가위원회 상태 업데이트까지 5초 정도 소요될 수 있습니다.</div>
 			<table class="test-list-table">
 				<colgroup>
 
@@ -47,7 +49,6 @@
 		</div>
 	</div>
 
-</div>
 <script>
 
 	$('.modal-close').click(function(){
@@ -62,3 +63,4 @@
 	
 	$(fnRefreshRaterList('${shtInfoId}'));
 </script>
+</div>
